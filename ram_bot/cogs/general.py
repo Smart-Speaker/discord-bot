@@ -15,7 +15,7 @@ class GeneralCog(commands.Cog):
 
     @commands.command(name="help")
     async def help_command(self, ctx, *, query: str | None = None):
-        include_management = self.bot.is_owner(ctx.author.id)
+        include_management = self.bot.is_owner(ctx.author.id) and ctx.guild is None
 
         if not query:
             await ctx.send(

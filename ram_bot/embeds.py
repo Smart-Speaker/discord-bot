@@ -12,15 +12,6 @@ def brand_color() -> discord.Color:
 
 def build_help_embed(prefix: str, include_management: bool) -> discord.Embed:
     categories = list(get_categories(include_management))
-    if not include_management:
-        categories.append(
-            CategoryInfo(
-                name="Management",
-                label="Management",
-                summary="Owner-only bot controls become visible when OWNER_ID is configured.",
-                commands=(),
-            )
-        )
 
     embed = discord.Embed(
         title="Help Menu - Ram's Guide For Beginners",
@@ -33,7 +24,7 @@ def build_help_embed(prefix: str, include_management: bool) -> discord.Embed:
     embed.add_field(name="Prefix", value=f"`{prefix}`", inline=False)
 
     for index, category in enumerate(categories, start=1):
-        command_list = ", ".join(f"`{command.name}`" for command in category.commands) or "Hidden until configured."
+        command_list = ", ".join(f"`{command.name}`" for command in category.commands)
         embed.add_field(
             name=category.label,
             value=f"{category.summary}\n{command_list}",

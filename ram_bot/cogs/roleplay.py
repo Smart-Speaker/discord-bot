@@ -9,6 +9,16 @@ class RoleplayCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    async def send_self_action(self, ctx, action_name: str, title: str, description: str):
+        gif_url = await get_reaction_gif(action_name)
+        embed = build_action_embed(
+            ctx,
+            title=title.format(author_name=ctx.author.display_name),
+            description=description.format(author=ctx.author.mention, author_name=ctx.author.display_name),
+            gif_url=gif_url,
+        )
+        await ctx.send(embed=embed)
+
     async def send_target_action(
         self,
         ctx,
@@ -66,14 +76,12 @@ class RoleplayCog(commands.Cog):
 
     @commands.command()
     async def laugh(self, ctx):
-        gif_url = await get_reaction_gif("laugh")
-        embed = build_action_embed(
+        await self.send_self_action(
             ctx,
-            title=f"{ctx.author.display_name} is laughing",
-            description=f"{ctx.author.mention} is having a great time.",
-            gif_url=gif_url,
+            "laugh",
+            "{author_name} is laughing",
+            "{author} is having a great time.",
         )
-        await ctx.send(embed=embed)
 
     @commands.command()
     async def pat(self, ctx, member: discord.Member | None = None):
@@ -85,6 +93,39 @@ class RoleplayCog(commands.Cog):
             "{source_name} patted {target_name}",
             "{target} got a head pat from {author_name}.",
             "{target} got a head pat from {source_name}.",
+        )
+
+    @commands.command()
+    async def cuddle(self, ctx, member: discord.Member | None = None):
+        await self.send_target_action(
+            ctx,
+            member,
+            "cuddle",
+            "{author_name} cuddled {target_name}",
+            "{source_name} cuddled {target_name}",
+            "{target} got a cozy cuddle from {author_name}.",
+            "{target} got a cozy cuddle from {source_name}.",
+        )
+
+    @commands.command()
+    async def wave(self, ctx, member: discord.Member | None = None):
+        await self.send_target_action(
+            ctx,
+            member,
+            "wave",
+            "{author_name} waved at {target_name}",
+            "{source_name} waved at {target_name}",
+            "{target} got a cute wave from {author_name}.",
+            "{target} got a cute wave from {source_name}.",
+        )
+
+    @commands.command()
+    async def blush(self, ctx):
+        await self.send_self_action(
+            ctx,
+            "blush",
+            "{author_name} is blushing",
+            "{author} is feeling a little shy right now.",
         )
 
     @commands.command()
@@ -101,14 +142,42 @@ class RoleplayCog(commands.Cog):
 
     @commands.command()
     async def cry(self, ctx):
-        gif_url = await get_reaction_gif("cry")
-        embed = build_action_embed(
+        await self.send_self_action(
             ctx,
-            title=f"{ctx.author.display_name} is crying",
-            description=f"{ctx.author.mention} needs a little comfort right now.",
-            gif_url=gif_url,
+            "cry",
+            "{author_name} is crying",
+            "{author} needs a little comfort right now.",
         )
-        await ctx.send(embed=embed)
+
+    @commands.command(hidden=True)
+    async def bite(self, ctx, member: discord.Member | None = None):
+        await self.send_target_action(
+            ctx,
+            member,
+            "bite",
+            "{author_name} bit {target_name}",
+            "{source_name} bit {target_name}",
+            "{target} got bitten by {author_name}!",
+            "{target} got bitten by {source_name}!",
+        )
+
+    @commands.command(hidden=True)
+    async def smug(self, ctx):
+        await self.send_self_action(
+            ctx,
+            "smug",
+            "{author_name} is feeling smug",
+            "{author} looks very pleased with themselves.",
+        )
+
+    @commands.command(hidden=True)
+    async def pout(self, ctx):
+        await self.send_self_action(
+            ctx,
+            "pout",
+            "{author_name} is pouting",
+            "{author} is being adorably stubborn right now.",
+        )
 
 
 async def setup(bot):
