@@ -1,4 +1,14 @@
 HELP_GIF_URL = "https://c.tenor.com/wklB6YsMfXEAAAAd/ram-re.gif"
+OTAKU_GIFS_API_URL = "https://api.otakugifs.xyz/gif?reaction={reaction}"
+
+ROLEPLAY_REACTIONS = {
+    "hug": "hug",
+    "kiss": "kiss",
+    "laugh": "laugh",
+    "pat": "pat",
+    "glare": "angrystare",
+    "cry": "cry",
+}
 
 ROLEPLAY_GIFS = {
     "hug": (

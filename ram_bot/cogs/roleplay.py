@@ -1,20 +1,17 @@
 import discord
-import random
 from discord.ext import commands
 
-from ram_bot.constants import ROLEPLAY_GIFS
 from ram_bot.embeds import build_action_embed
+from ram_bot.reactions import get_reaction_gif
 
 
 class RoleplayCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    def get_gif(self, action_name: str) -> str:
-        return random.choice(ROLEPLAY_GIFS[action_name])
-
     async def send_target_action(self, ctx, member: discord.Member | None, action_name: str, description: str):
         target = member or ctx.author
+        gif_url = await get_reaction_gif(action_name)
         embed = build_action_embed(
             ctx,
             title=f"{ctx.author.display_name} used {action_name}",
@@ -24,7 +21,7 @@ class RoleplayCog(commands.Cog):
                 target=target.mention,
                 target_name=target.display_name,
             ),
-            gif_url=self.get_gif(action_name),
+            gif_url=gif_url,
         )
         await ctx.send(embed=embed)
 
@@ -48,11 +45,12 @@ class RoleplayCog(commands.Cog):
 
     @commands.command()
     async def laugh(self, ctx):
+        gif_url = await get_reaction_gif("laugh")
         embed = build_action_embed(
             ctx,
             title=f"{ctx.author.display_name} is laughing",
             description=f"{ctx.author.mention} is having a great time.",
-            gif_url=self.get_gif("laugh"),
+            gif_url=gif_url,
         )
         await ctx.send(embed=embed)
 
@@ -76,11 +74,12 @@ class RoleplayCog(commands.Cog):
 
     @commands.command()
     async def cry(self, ctx):
+        gif_url = await get_reaction_gif("cry")
         embed = build_action_embed(
             ctx,
             title=f"{ctx.author.display_name} is crying",
             description=f"{ctx.author.mention} needs a little comfort right now.",
-            gif_url=self.get_gif("cry"),
+            gif_url=gif_url,
         )
         await ctx.send(embed=embed)
 
