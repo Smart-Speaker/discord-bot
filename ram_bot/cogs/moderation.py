@@ -1,6 +1,8 @@
 import discord
+import random
 from discord.ext import commands
 
+from ram_bot.constants import BAN_REASONS, KICK_REASONS, SELF_REMOVAL_MESSAGES
 from ram_bot.embeds import build_action_embed
 from ram_bot.reactions import get_reaction_gif
 
@@ -8,6 +10,13 @@ from ram_bot.reactions import get_reaction_gif
 class ModerationCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+
+    @staticmethod
+    def resolve_reason(reason: str, defaults: tuple[str, ...]) -> str:
+        cleaned = reason.strip()
+        if not cleaned or cleaned.lower() == "no reason provided":
+            return random.choice(defaults)
+        return cleaned
 
     async def send_moderation_embed(self, ctx, title: str, description: str):
         gif_url = await get_reaction_gif("evillaugh")
@@ -25,12 +34,13 @@ class ModerationCog(commands.Cog):
     @commands.cooldown(1, 5, commands.BucketType.guild)
     async def kick(self, ctx, member: discord.Member, *, reason: str = "No reason provided"):
         if member == ctx.author:
-            await ctx.send("You cannot kick yourself.")
+            await ctx.send(random.choice(SELF_REMOVAL_MESSAGES))
             return
         if member == ctx.guild.me:
             await ctx.send("I cannot kick myself.")
             return
 
+        reason = self.resolve_reason(reason, KICK_REASONS)
         await member.kick(reason=f"{ctx.author} | {reason}")
         await self.send_moderation_embed(
             ctx,
@@ -44,12 +54,13 @@ class ModerationCog(commands.Cog):
     @commands.cooldown(1, 5, commands.BucketType.guild)
     async def ban(self, ctx, member: discord.Member, *, reason: str = "No reason provided"):
         if member == ctx.author:
-            await ctx.send("You cannot ban yourself.")
+            await ctx.send(random.choice(SELF_REMOVAL_MESSAGES))
             return
         if member == ctx.guild.me:
             await ctx.send("I cannot ban myself.")
             return
 
+        reason = self.resolve_reason(reason, BAN_REASONS)
         await member.ban(reason=f"{ctx.author} | {reason}")
         await self.send_moderation_embed(
             ctx,

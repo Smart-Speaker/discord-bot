@@ -34,13 +34,13 @@ ROLEPLAY_CATEGORY = CategoryInfo(
     commands=(
         CommandInfo("hug", "hug [@user]", "Send a soft anime hug."),
         CommandInfo("kiss", "kiss [@user]", "Send a sweet anime kiss."),
-        CommandInfo("laugh", "laugh", "Show a cheerful laughing reaction."),
+        CommandInfo("laugh", "laugh [@user]", "Show a cheerful laughing reaction, or laugh with someone."),
         CommandInfo("pat", "pat [@user]", "Give someone a cute head pat."),
         CommandInfo("cuddle", "cuddle [@user]", "Wrap someone up in a cozy cuddle."),
         CommandInfo("wave", "wave [@user]", "Send a friendly anime wave."),
-        CommandInfo("blush", "blush", "Show a shy blushing reaction."),
+        CommandInfo("blush", "blush [@user]", "Show a shy blushing reaction, or blush at someone."),
         CommandInfo("glare", "glare [@user]", "Give someone a dramatic anime stare."),
-        CommandInfo("cry", "cry", "Show a sad crying reaction."),
+        CommandInfo("cry", "cry [@user]", "Show a sad crying reaction, or cry with someone."),
     ),
 )
 

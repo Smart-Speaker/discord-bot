@@ -84,7 +84,7 @@ class GeneralCog(commands.Cog):
     @commands.command()
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def hello(self, ctx):
-        await ctx.reply(f"Hi there! {ctx.author.display_name} :)", mention_author=True)
+        await ctx.reply(f"Hi there! {ctx.author.display_name} :grin:", mention_author=True)
 
 
 async def setup(bot):

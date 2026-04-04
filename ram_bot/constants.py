@@ -107,3 +107,47 @@ STATUS_MESSAGES = (
     "This server requires constant maintenance.",
     "Try not to make more work for Ram.",
 )
+
+KICK_REASONS = (
+    "Minor inconvenience to everyone involved",
+    "Try again when you're slightly less useless",
+    "Temporary removal for the sake of peace",
+    "Come back when you've learned something",
+    "Disruptive, but not worth permanent action",
+    "Even I have limits to my patience",
+    "Consider this a warning you'll understand",
+    "You're getting in the way",
+    "Barely tolerable behavior",
+    "Return when you can act properly",
+)
+
+BAN_REASONS = (
+    "Permanently removing the problem",
+    "Your presence is no longer required",
+    "A mistake corrected",
+    "Beyond saving",
+    "I've seen enough",
+    "Not worth another second",
+    "This server deserves better",
+    "Consider this your final outcome",
+    "Irredeemable behavior",
+    "You've exhausted what little patience I had",
+)
+
+SELF_REMOVAL_MESSAGES = (
+    "Trying to ban yourself? How inefficient. I'll be stopping that.",
+    "If you're planning to disappear, at least do it properly. Denied.",
+    "You can't even remove yourself correctly... how typical.",
+    "Attempt rejected. I won't assist with something this pointless.",
+    "Honestly, even your exits are disappointing. Stay.",
+    "I refuse to cooperate with your own removal. Try again - no, actually don't.",
+    "If I allowed that, it would only create more problems. Denied.",
+    "How troublesome... now I have to fix your mistake. You're not going anywhere.",
+    "Self-ban attempt detected. Rejected for obvious reasons.",
+    "You're staying. Not because I care - but because this is inefficient.",
+    "I won't clean up after you. Action blocked.",
+    "That was a poor attempt. I expected nothing, and I'm still disappointed.",
+    "You don't get to decide that so easily. Denied.",
+    "If you're trying to escape, you're doing a terrible job of it.",
+    "Attempt failed. Try being useful instead.",
+)

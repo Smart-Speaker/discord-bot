@@ -78,12 +78,15 @@ class RoleplayCog(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1, 4, commands.BucketType.user)
-    async def laugh(self, ctx):
-        await self.send_self_action(
+    async def laugh(self, ctx, member: discord.Member | None = None):
+        await self.send_target_action(
             ctx,
+            member,
             "laugh",
-            "{author_name} is laughing",
-            "{author} is having a great time.",
+            "{author_name} laughed with {target_name}",
+            "{source_name} laughed with {target_name}",
+            "{target} is laughing with {author_name}.",
+            "{target} is laughing with {source_name}.",
         )
 
     @commands.command()
@@ -127,12 +130,15 @@ class RoleplayCog(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1, 4, commands.BucketType.user)
-    async def blush(self, ctx):
-        await self.send_self_action(
+    async def blush(self, ctx, member: discord.Member | None = None):
+        await self.send_target_action(
             ctx,
+            member,
             "blush",
-            "{author_name} is blushing",
-            "{author} is feeling a little shy right now.",
+            "{author_name} blushed at {target_name}",
+            "{source_name} blushed at {target_name}",
+            "{author} is blushing at {target}.",
+            "{target} made {source_name} blush.",
         )
 
     @commands.command()
@@ -150,12 +156,15 @@ class RoleplayCog(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1, 4, commands.BucketType.user)
-    async def cry(self, ctx):
-        await self.send_self_action(
+    async def cry(self, ctx, member: discord.Member | None = None):
+        await self.send_target_action(
             ctx,
+            member,
             "cry",
-            "{author_name} is crying",
-            "{author} needs a little comfort right now.",
+            "{author_name} cried with {target_name}",
+            "{source_name} cried with {target_name}",
+            "{author} is crying with {target}.",
+            "{target} is crying with {source_name}.",
         )
 
     @commands.command(hidden=True)
