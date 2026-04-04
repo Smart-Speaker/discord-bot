@@ -13,10 +13,10 @@ def brand_color() -> discord.Color:
 def format_command_rows(commands: tuple[CommandInfo, ...], per_row: int = 3, limit: int | None = None) -> str:
     entries = [f"`{command.name}`" for command in commands[:limit]]
     rows = [
-        ", ".join(entries[index:index + per_row])
+        " | ".join(entries[index:index + per_row])
         for index in range(0, len(entries), per_row)
     ]
-    return "\n".join(rows)
+    return "\n".join(f"- {row}" for row in rows)
 
 
 def build_help_embed(prefix: str, include_management: bool, include_admin_tools: bool = False) -> discord.Embed:
@@ -36,18 +36,14 @@ def build_help_embed(prefix: str, include_management: bool, include_admin_tools:
         command_list = format_command_rows(category.commands, per_row=3)
         embed.add_field(
             name=category.label,
-            value=f"{category.summary}\n{command_list}",
+            value=f"{category.summary}\n\n**Commands**\n{command_list}",
             inline=True,
         )
         if index % 2 == 0:
             embed.add_field(name=SPACER, value=SPACER, inline=False)
 
     if len(categories) % 2 != 0:
-        embed.add_field(
-            name=SPACER,
-            value=SPACER,
-            inline=False,
-        )
+        embed.add_field(name=SPACER, value=SPACER, inline=False)
 
     embed.add_field(
         name="Examples",
@@ -78,7 +74,7 @@ def build_help_pages(prefix: str, include_management: bool, include_admin_tools:
         command_list = format_command_rows(category.commands, per_row=3)
         overview.add_field(
             name=category.label,
-            value=f"{category.summary}\n{command_list}",
+            value=f"{category.summary}\n\n**Commands**\n{command_list}",
             inline=False,
         )
     overview.set_image(url=HELP_GIF_URL)
@@ -155,7 +151,7 @@ def build_category_help_pages(prefix: str, category: CategoryInfo, page_size: in
                 ),
                 inline=False,
             )
-        embed.set_footer(text=f"Page {page_number}/{total_pages} • Use {prefix}help <command> for individual command help.")
+        embed.set_footer(text=f"Page {page_number}/{total_pages} - Use {prefix}help <command> for individual command help.")
         pages.append(embed)
 
     return pages

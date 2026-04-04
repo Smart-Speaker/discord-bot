@@ -113,6 +113,7 @@ class ProgressionCog(commands.Cog):
     async def rank(self, ctx, member: discord.Member | None = None):
         target = member or ctx.author
         profile = self.get_profile(ctx.guild.id, target.id)
+        tier = affinity_tier(profile["affinity"])
         current_level = profile["level"]
         current_level_xp = xp_for_level(current_level)
         next_level_xp = xp_for_level(current_level + 1)
@@ -121,7 +122,7 @@ class ProgressionCog(commands.Cog):
         embed = discord.Embed(title=f"{target.display_name}'s Rank", color=brand_color())
         embed.add_field(name="Level", value=str(current_level), inline=True)
         embed.add_field(name="XP", value=str(profile["xp"]), inline=True)
-        embed.add_field(name="Affinity", value=str(profile["affinity"]), inline=True)
+        embed.add_field(name="Affinity", value=f"{profile['affinity']} ({tier.title()})", inline=True)
         embed.add_field(
             name="Progress",
             value=f"`{progress_xp}/{needed_xp} XP` to level `{current_level + 1}`",
