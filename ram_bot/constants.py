@@ -2,6 +2,7 @@ HELP_GIF_URL = "https://c.tenor.com/wklB6YsMfXEAAAAd/ram-re.gif"
 OTAKU_GIFS_API_URL = "https://api.otakugifs.xyz/gif?reaction={reaction}"
 
 ROLEPLAY_REACTIONS = {
+    "evillaugh": "evillaugh",
     "hug": "hug",
     "kiss": "kiss",
     "laugh": "laugh",
@@ -11,6 +12,11 @@ ROLEPLAY_REACTIONS = {
 }
 
 ROLEPLAY_GIFS = {
+    "evillaugh": (
+        "https://media.tenor.com/0avLz4cJc98AAAAC/anime-evil-laugh.gif",
+        "https://media.tenor.com/F_dz9wA5kXEAAAAC/anime-laugh.gif",
+        "https://media.tenor.com/RmRmN6v8vVgAAAAC/evil-laugh-anime.gif",
+    ),
     "hug": (
         "https://c.tenor.com/yc_shX2Xl_QAAAAd/girl-anime.gif",
         "https://media.tenor.com/3ZZQ0H6V1n8AAAAC/anime-hug.gif",

@@ -9,15 +9,30 @@ class RoleplayCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    async def send_target_action(self, ctx, member: discord.Member | None, action_name: str, description: str):
+    async def send_target_action(
+        self,
+        ctx,
+        member: discord.Member | None,
+        action_name: str,
+        targeted_title: str,
+        self_title: str,
+        targeted_description: str,
+        self_description: str,
+    ):
         target = member or ctx.author
+        source_name = ctx.author.display_name if member is not None else ctx.me.display_name
         gif_url = await get_reaction_gif(action_name)
         embed = build_action_embed(
             ctx,
-            title=f"{ctx.author.display_name} used {action_name}",
-            description=description.format(
+            title=(targeted_title if member is not None else self_title).format(
+                author_name=ctx.author.display_name,
+                source_name=source_name,
+                target_name=target.display_name,
+            ),
+            description=(targeted_description if member is not None else self_description).format(
                 author=ctx.author.mention,
                 author_name=ctx.author.display_name,
+                source_name=source_name,
                 target=target.mention,
                 target_name=target.display_name,
             ),
@@ -31,7 +46,10 @@ class RoleplayCog(commands.Cog):
             ctx,
             member,
             "hug",
+            "{author_name} hugged {target_name}",
+            "{source_name} hugged {target_name}",
             "{target} you were hugged by {author_name}!",
+            "{target} you were hugged by {source_name}!",
         )
 
     @commands.command()
@@ -40,7 +58,10 @@ class RoleplayCog(commands.Cog):
             ctx,
             member,
             "kiss",
+            "{author_name} kissed {target_name}",
+            "{source_name} kissed {target_name}",
             "{target} you were kissed by {author_name}!",
+            "{target} you were kissed by {source_name}!",
         )
 
     @commands.command()
@@ -60,7 +81,10 @@ class RoleplayCog(commands.Cog):
             ctx,
             member,
             "pat",
+            "{author_name} patted {target_name}",
+            "{source_name} patted {target_name}",
             "{target} got a head pat from {author_name}.",
+            "{target} got a head pat from {source_name}.",
         )
 
     @commands.command()
@@ -69,7 +93,10 @@ class RoleplayCog(commands.Cog):
             ctx,
             member,
             "glare",
-            "{author_name} is glaring at {target_name}.",
+            "{author_name} glared at {target_name}",
+            "{source_name} glared at {target_name}",
+            "{author_name} is glaring at {target}.",
+            "{source_name} is glaring at {target}.",
         )
 
     @commands.command()

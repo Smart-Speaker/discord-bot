@@ -1,10 +1,23 @@
 import discord
 from discord.ext import commands
 
+from ram_bot.embeds import build_action_embed
+from ram_bot.reactions import get_reaction_gif
+
 
 class ModerationCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+
+    async def send_moderation_embed(self, ctx, title: str, description: str):
+        gif_url = await get_reaction_gif("evillaugh")
+        embed = build_action_embed(
+            ctx,
+            title=title,
+            description=description,
+            gif_url=gif_url,
+        )
+        await ctx.send(embed=embed)
 
     @commands.command()
     @commands.has_permissions(kick_members=True)
@@ -17,7 +30,11 @@ class ModerationCog(commands.Cog):
             return
 
         await member.kick(reason=f"{ctx.author} | {reason}")
-        await ctx.send(f"Kicked {member.mention}. Reason: {reason}")
+        await self.send_moderation_embed(
+            ctx,
+            title=f"{ctx.author.display_name} kicked {member.display_name}",
+            description=f"{member.mention} was kicked.\nReason: `{reason}`",
+        )
 
     @commands.command()
     @commands.has_permissions(ban_members=True)
@@ -30,7 +47,11 @@ class ModerationCog(commands.Cog):
             return
 
         await member.ban(reason=f"{ctx.author} | {reason}")
-        await ctx.send(f"Banned {member.mention}. Reason: {reason}")
+        await self.send_moderation_embed(
+            ctx,
+            title=f"{ctx.author.display_name} banned {member.display_name}",
+            description=f"{member.mention} was banned.\nReason: `{reason}`",
+        )
 
     @commands.command()
     @commands.has_permissions(ban_members=True)

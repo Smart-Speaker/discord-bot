@@ -11,14 +11,14 @@ class CommandInfo:
 @dataclass(frozen=True)
 class CategoryInfo:
     name: str
-    emoji: str
+    label: str
     summary: str
     commands: tuple[CommandInfo, ...]
 
 
 GENERAL_CATEGORY = CategoryInfo(
     name="General",
-    emoji="🛠️",
+    label="Tools",
     summary="Core bot commands and help tools.",
     commands=(
         CommandInfo("help", "help [command/category]", "Show the help menu or details for a command."),
@@ -29,21 +29,21 @@ GENERAL_CATEGORY = CategoryInfo(
 
 ROLEPLAY_CATEGORY = CategoryInfo(
     name="Roleplay",
-    emoji="🌸",
+    label="Roleplay",
     summary="Cute reaction commands with anime GIFs.",
     commands=(
-        CommandInfo("hug", "hug [@user]", "Send a hug embed."),
-        CommandInfo("kiss", "kiss [@user]", "Send a kiss embed."),
-        CommandInfo("laugh", "laugh", "Show a laughing reaction."),
-        CommandInfo("pat", "pat [@user]", "Give someone a head pat."),
-        CommandInfo("glare", "glare [@user]", "Glare at someone dramatically."),
-        CommandInfo("cry", "cry", "Show a crying reaction."),
+        CommandInfo("hug", "hug [@user]", "Send a soft anime hug."),
+        CommandInfo("kiss", "kiss [@user]", "Send a sweet anime kiss."),
+        CommandInfo("laugh", "laugh", "Show a cheerful laughing reaction."),
+        CommandInfo("pat", "pat [@user]", "Give someone a cute head pat."),
+        CommandInfo("glare", "glare [@user]", "Give someone a dramatic anime stare."),
+        CommandInfo("cry", "cry", "Show a sad crying reaction."),
     ),
 )
 
 MODERATION_CATEGORY = CategoryInfo(
     name="Moderation",
-    emoji="🛡️",
+    label="Moderation",
     summary="Server moderation and cleanup tools.",
     commands=(
         CommandInfo("kick", "kick @user [reason]", "Kick a member from the server."),
@@ -55,7 +55,7 @@ MODERATION_CATEGORY = CategoryInfo(
 
 MANAGEMENT_CATEGORY = CategoryInfo(
     name="Management",
-    emoji="⚙️",
+    label="Management",
     summary="Owner-only bot controls and diagnostics.",
     commands=(
         CommandInfo("status", "status", "Show bot and hosting status."),

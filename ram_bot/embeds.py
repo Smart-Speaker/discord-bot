@@ -3,34 +3,49 @@ import discord
 from ram_bot.catalog import CategoryInfo, CommandInfo, get_categories
 from ram_bot.constants import EMBED_COLOR, HELP_GIF_URL
 
+SPACER = "\u200b"
+
 
 def brand_color() -> discord.Color:
     return discord.Color.from_rgb(*EMBED_COLOR)
 
 
 def build_help_embed(prefix: str, include_management: bool) -> discord.Embed:
+    categories = list(get_categories(include_management))
+    if not include_management:
+        categories.append(
+            CategoryInfo(
+                name="Management",
+                label="Management",
+                summary="Owner-only bot controls become visible when OWNER_ID is configured.",
+                commands=(),
+            )
+        )
+
     embed = discord.Embed(
         title="Help Menu - Ram's Guide For Beginners",
         description=(
-            "Here are all my commands. Pick a category below, or use "
-            f"`{prefix}help <command>` for more detail."
+            "Here are all my commands.\n"
+            f"Use `{prefix}help <command>` for more detail."
         ),
         color=brand_color(),
     )
     embed.add_field(name="Prefix", value=f"`{prefix}`", inline=False)
 
-    for category in get_categories(include_management):
-        command_list = ", ".join(f"`{command.name}`" for command in category.commands)
+    for index, category in enumerate(categories, start=1):
+        command_list = ", ".join(f"`{command.name}`" for command in category.commands) or "Hidden until configured."
         embed.add_field(
-            name=f"{category.emoji} {category.name}",
+            name=category.label,
             value=f"{category.summary}\n{command_list}",
-            inline=False,
+            inline=True,
         )
+        if index % 2 == 0:
+            embed.add_field(name=SPACER, value=SPACER, inline=False)
 
-    if not include_management:
+    if len(categories) % 2 != 0:
         embed.add_field(
-            name="⚙️ Management",
-            value="Owner-only commands are hidden until OWNER_ID is configured.",
+            name=SPACER,
+            value=SPACER,
             inline=False,
         )
 
@@ -61,7 +76,7 @@ def build_command_help_embed(prefix: str, command: CommandInfo) -> discord.Embed
 
 def build_category_help_embed(prefix: str, category: CategoryInfo) -> discord.Embed:
     embed = discord.Embed(
-        title=f"{category.emoji} {category.name} Commands",
+        title=f"{category.label} Commands",
         description=category.summary,
         color=brand_color(),
     )
