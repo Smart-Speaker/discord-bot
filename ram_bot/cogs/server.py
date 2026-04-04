@@ -2,6 +2,10 @@ import discord
 from discord.ext import commands
 
 from ram_bot.constants import DEFAULT_AUTO_TIMEOUT_MINUTES, DEFAULT_DOMAIN_WHITELIST, DEFAULT_WARNING_THRESHOLD, GUILD_JOIN_GIF_URL
+from ram_bot.embeds import brand_color
+
+DEFAULT_WELCOME_TEMPLATE = "Welcome {user} to {server}!"
+DEFAULT_GOODBYE_TEMPLATE = "Goodbye {username}."
 
 
 class ServerCog(commands.Cog):
@@ -32,7 +36,7 @@ class ServerCog(commands.Cog):
 
     @commands.command()
     @commands.guild_only()
-    @commands.has_permissions(manage_guild=True)
+    @commands.has_permissions(administrator=True)
     @commands.cooldown(1, 5, commands.BucketType.guild)
     async def setwelcome(self, ctx, channel: discord.TextChannel, *, message: str):
         self.bot.settings.update_guild(
@@ -44,7 +48,7 @@ class ServerCog(commands.Cog):
 
     @commands.command()
     @commands.guild_only()
-    @commands.has_permissions(manage_guild=True)
+    @commands.has_permissions(administrator=True)
     @commands.cooldown(1, 5, commands.BucketType.guild)
     async def clearwelcome(self, ctx):
         self.bot.settings.update_guild(
@@ -56,7 +60,7 @@ class ServerCog(commands.Cog):
 
     @commands.command()
     @commands.guild_only()
-    @commands.has_permissions(manage_guild=True)
+    @commands.has_permissions(administrator=True)
     @commands.cooldown(1, 5, commands.BucketType.guild)
     async def setgoodbye(self, ctx, channel: discord.TextChannel, *, message: str):
         self.bot.settings.update_guild(
@@ -68,7 +72,7 @@ class ServerCog(commands.Cog):
 
     @commands.command()
     @commands.guild_only()
-    @commands.has_permissions(manage_guild=True)
+    @commands.has_permissions(administrator=True)
     @commands.cooldown(1, 5, commands.BucketType.guild)
     async def cleargoodbye(self, ctx):
         self.bot.settings.update_guild(
@@ -80,7 +84,7 @@ class ServerCog(commands.Cog):
 
     @commands.command()
     @commands.guild_only()
-    @commands.has_permissions(manage_roles=True)
+    @commands.has_permissions(administrator=True)
     @commands.cooldown(1, 5, commands.BucketType.guild)
     async def setautorole(self, ctx, role: discord.Role):
         self.bot.settings.update_guild(ctx.guild.id, autorole_id=role.id)
@@ -88,7 +92,7 @@ class ServerCog(commands.Cog):
 
     @commands.command()
     @commands.guild_only()
-    @commands.has_permissions(manage_roles=True)
+    @commands.has_permissions(administrator=True)
     @commands.cooldown(1, 5, commands.BucketType.guild)
     async def clearautorole(self, ctx):
         self.bot.settings.update_guild(ctx.guild.id, autorole_id=None)
@@ -96,7 +100,7 @@ class ServerCog(commands.Cog):
 
     @commands.command()
     @commands.guild_only()
-    @commands.has_permissions(manage_guild=True)
+    @commands.has_permissions(administrator=True)
     @commands.cooldown(1, 5, commands.BucketType.guild)
     async def setlogchannel(self, ctx, channel: discord.TextChannel):
         self.bot.settings.update_guild(ctx.guild.id, log_channel_id=channel.id)
@@ -104,7 +108,7 @@ class ServerCog(commands.Cog):
 
     @commands.command()
     @commands.guild_only()
-    @commands.has_permissions(manage_guild=True)
+    @commands.has_permissions(administrator=True)
     @commands.cooldown(1, 5, commands.BucketType.guild)
     async def clearlogchannel(self, ctx):
         self.bot.settings.update_guild(ctx.guild.id, log_channel_id=None)
@@ -112,13 +116,13 @@ class ServerCog(commands.Cog):
 
     @commands.command()
     @commands.guild_only()
-    @commands.has_permissions(manage_guild=True)
+    @commands.has_permissions(administrator=True)
     @commands.cooldown(1, 5, commands.BucketType.guild)
     async def serversettings(self, ctx):
         settings = self.get_settings(ctx.guild.id)
         embed = discord.Embed(
             title=f"{ctx.guild.name} Settings",
-            color=discord.Color.blurple(),
+            color=brand_color(),
         )
         embed.add_field(
             name="Welcome",
@@ -209,6 +213,22 @@ class ServerCog(commands.Cog):
     @commands.Cog.listener()
     async def on_guild_join(self, guild: discord.Guild):
         channel = self.find_join_channel(guild)
+        updates: dict[str, int | str] = {}
+
+        if channel is not None and isinstance(channel, discord.TextChannel):
+            settings = self.get_settings(guild.id)
+            if not settings.get("welcome_channel_id"):
+                updates["welcome_channel_id"] = channel.id
+            if not settings.get("welcome_message"):
+                updates["welcome_message"] = DEFAULT_WELCOME_TEMPLATE
+            if not settings.get("goodbye_channel_id"):
+                updates["goodbye_channel_id"] = channel.id
+            if not settings.get("goodbye_message"):
+                updates["goodbye_message"] = DEFAULT_GOODBYE_TEMPLATE
+
+        if updates:
+            self.bot.settings.update_guild(guild.id, **updates)
+
         if channel is None:
             return
 
@@ -218,7 +238,7 @@ class ServerCog(commands.Cog):
                 "Hmph. Ram is here now.\n"
                 "Use `!help` if you need the command list. Try not to waste Ram's time."
             ),
-            color=discord.Color.from_rgb(248, 186, 203),
+            color=brand_color(),
         )
         embed.set_image(url=GUILD_JOIN_GIF_URL)
         await channel.send(embed=embed)

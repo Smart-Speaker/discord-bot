@@ -59,6 +59,29 @@ class RamBot(commands.Bot):
     async def before_rotate_status(self):
         await self.wait_until_ready()
 
+    @staticmethod
+    def format_cooldown(seconds: float) -> str:
+        remaining = max(1, int(round(seconds)))
+        days, remainder = divmod(remaining, 86400)
+        hours, remainder = divmod(remainder, 3600)
+        minutes, seconds = divmod(remainder, 60)
+
+        parts: list[str] = []
+        if days:
+            parts.append(f"{days} day{'s' if days != 1 else ''}")
+        if hours:
+            parts.append(f"{hours} hour{'s' if hours != 1 else ''}")
+        if minutes:
+            parts.append(f"{minutes} minute{'s' if minutes != 1 else ''}")
+        if seconds and not days:
+            parts.append(f"{seconds} second{'s' if seconds != 1 else ''}")
+
+        if len(parts) == 1:
+            return parts[0]
+        if len(parts) == 2:
+            return f"{parts[0]} and {parts[1]}"
+        return f"{', '.join(parts[:-1])}, and {parts[-1]}"
+
     async def on_command_error(self, ctx, error):
         if isinstance(error, commands.CheckFailure):
             return
@@ -75,7 +98,8 @@ class RamBot(commands.Bot):
             await ctx.send("I could not understand that argument. Check the command and try again.")
             return
         if isinstance(error, commands.CommandOnCooldown):
-            await ctx.send(f"That command is on cooldown. Try again in `{error.retry_after:.1f}s`.")
+            retry_after = self.format_cooldown(error.retry_after)
+            await ctx.send(f"Hmph. You're being impatient again. Try `{ctx.command}` in `{retry_after}`.")
             return
         if isinstance(error, commands.NoPrivateMessage):
             await ctx.send("That command can only be used in a server.")

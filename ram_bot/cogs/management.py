@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 
 from ram_bot.checks import owner_only
+from ram_bot.embeds import brand_color
 from ram_bot.ollama import test_ollama_connection
 
 
@@ -15,7 +16,7 @@ class ManagementCog(commands.Cog):
     async def status(self, ctx):
         embed = discord.Embed(
             title="Owner Status Panel",
-            color=discord.Color.green(),
+            color=brand_color(),
         )
         embed.add_field(name="Prefix", value=f"`{self.bot.command_prefix}`")
         embed.add_field(name="Latency", value=f"`{round(self.bot.latency * 1000)}ms`")
@@ -54,7 +55,7 @@ class ManagementCog(commands.Cog):
 
         embed = discord.Embed(
             title="Ollama Connectivity Test",
-            color=discord.Color.green(),
+            color=brand_color(),
         )
         embed.add_field(name="Endpoint", value=f"`{self.bot.config.ollama_url}`", inline=False)
         embed.add_field(name="Model", value=f"`{self.bot.config.ollama_model}`", inline=True)

@@ -1,6 +1,8 @@
 import discord
 from discord.ext import commands
 
+from ram_bot.embeds import brand_color
+
 
 class AuditCog(commands.Cog):
     def __init__(self, bot):
@@ -24,7 +26,7 @@ class AuditCog(commands.Cog):
 
         embed = discord.Embed(
             title="Message Deleted",
-            color=discord.Color.red(),
+            color=brand_color(),
             timestamp=discord.utils.utcnow(),
         )
         embed.add_field(name="Author", value=message.author.mention, inline=True)
@@ -43,7 +45,7 @@ class AuditCog(commands.Cog):
 
         embed = discord.Embed(
             title="Message Edited",
-            color=discord.Color.orange(),
+            color=brand_color(),
             timestamp=discord.utils.utcnow(),
         )
         embed.add_field(name="Author", value=before.author.mention, inline=True)

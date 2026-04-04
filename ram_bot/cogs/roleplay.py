@@ -162,6 +162,45 @@ class RoleplayCog(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1, 4, commands.BucketType.user)
+    async def handhold(self, ctx, member: discord.Member | None = None):
+        await self.send_target_action(
+            ctx,
+            member,
+            "handhold",
+            "{author_name} held {target_name}'s hand",
+            "{source_name} held {target_name}'s hand",
+            "{target} is holding hands with {author_name}.",
+            "{target} is holding hands with {source_name}.",
+        )
+
+    @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def poke(self, ctx, member: discord.Member | None = None):
+        await self.send_target_action(
+            ctx,
+            member,
+            "poke",
+            "{author_name} poked {target_name}",
+            "{source_name} poked {target_name}",
+            "{target} got poked by {author_name}.",
+            "{target} got poked by {source_name}.",
+        )
+
+    @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def nuzzle(self, ctx, member: discord.Member | None = None):
+        await self.send_target_action(
+            ctx,
+            member,
+            "nuzzle",
+            "{author_name} nuzzled {target_name}",
+            "{source_name} nuzzled {target_name}",
+            "{target} got a soft nuzzle from {author_name}.",
+            "{target} got a soft nuzzle from {source_name}.",
+        )
+
+    @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
     async def wave(self, ctx, member: discord.Member | None = None):
         await self.send_target_action(
             ctx,
@@ -171,6 +210,19 @@ class RoleplayCog(commands.Cog):
             "{source_name} waved at {target_name}",
             "{target} got a cute wave from {author_name}.",
             "{target} got a cute wave from {source_name}.",
+        )
+
+    @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def smile(self, ctx, member: discord.Member | None = None):
+        await self.send_target_action(
+            ctx,
+            member,
+            "smile",
+            "{author_name} smiled at {target_name}",
+            "{source_name} smiled at {target_name}",
+            "{author} smiled at {target}.",
+            "{target} got a soft smile from {source_name}.",
         )
 
     @commands.command()

@@ -4,6 +4,7 @@ from uuid import uuid4
 import discord
 from discord.ext import commands, tasks
 
+from ram_bot.embeds import brand_color
 from ram_bot.timeparse import parse_duration
 
 
@@ -22,7 +23,7 @@ class UtilityCog(commands.Cog):
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def avatar(self, ctx, member: discord.Member | discord.User | None = None):
         target = member or ctx.author
-        embed = discord.Embed(title=f"{target.display_name}'s Avatar", color=discord.Color.blurple())
+        embed = discord.Embed(title=f"{target.display_name}'s Avatar", color=brand_color())
         embed.set_image(url=target.display_avatar.url)
         await ctx.send(embed=embed)
 
@@ -31,7 +32,7 @@ class UtilityCog(commands.Cog):
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def userinfo(self, ctx, member: discord.Member | None = None):
         target = member or ctx.author
-        embed = discord.Embed(title=f"User Info - {target.display_name}", color=discord.Color.blurple())
+        embed = discord.Embed(title=f"User Info - {target.display_name}", color=brand_color())
         embed.add_field(name="Mention", value=target.mention, inline=True)
         embed.add_field(name="ID", value=f"`{target.id}`", inline=True)
         embed.add_field(name="Joined", value=discord.utils.format_dt(target.joined_at, style="F") if target.joined_at else "Unknown", inline=False)
@@ -46,7 +47,7 @@ class UtilityCog(commands.Cog):
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def serverinfo(self, ctx):
         guild = ctx.guild
-        embed = discord.Embed(title=f"Server Info - {guild.name}", color=discord.Color.blurple())
+        embed = discord.Embed(title=f"Server Info - {guild.name}", color=brand_color())
         embed.add_field(name="Members", value=str(guild.member_count), inline=True)
         embed.add_field(name="Channels", value=str(len(guild.channels)), inline=True)
         embed.add_field(name="Roles", value=str(len(guild.roles)), inline=True)
@@ -110,7 +111,7 @@ class UtilityCog(commands.Cog):
             await ctx.send("Use `question | option 1 | option 2` with up to 10 options.")
             return
 
-        embed = discord.Embed(title="Poll", description=question, color=discord.Color.blurple())
+        embed = discord.Embed(title="Poll", description=question, color=brand_color())
         lines = [f"{POLL_REACTIONS[index]} {option}" for index, option in enumerate(options)]
         embed.add_field(name="Options", value="\n".join(lines), inline=False)
         poll_message = await ctx.send(embed=embed)

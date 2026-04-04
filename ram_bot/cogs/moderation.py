@@ -29,7 +29,7 @@ class ModerationCog(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command()
-    @commands.has_permissions(kick_members=True)
+    @commands.has_permissions(administrator=True)
     @commands.guild_only()
     @commands.cooldown(1, 5, commands.BucketType.guild)
     async def kick(self, ctx, member: discord.Member, *, reason: str = "No reason provided"):
@@ -49,7 +49,7 @@ class ModerationCog(commands.Cog):
         )
 
     @commands.command()
-    @commands.has_permissions(ban_members=True)
+    @commands.has_permissions(administrator=True)
     @commands.guild_only()
     @commands.cooldown(1, 5, commands.BucketType.guild)
     async def ban(self, ctx, member: discord.Member, *, reason: str = "No reason provided"):
@@ -69,7 +69,7 @@ class ModerationCog(commands.Cog):
         )
 
     @commands.command()
-    @commands.has_permissions(ban_members=True)
+    @commands.has_permissions(administrator=True)
     @commands.guild_only()
     @commands.cooldown(1, 5, commands.BucketType.guild)
     async def unban(self, ctx, *, user: str = ""):
@@ -90,7 +90,7 @@ class ModerationCog(commands.Cog):
         await ctx.send("I could not find that user in the ban list.")
 
     @commands.command()
-    @commands.has_permissions(manage_messages=True)
+    @commands.has_permissions(administrator=True)
     @commands.guild_only()
     @commands.cooldown(1, 5, commands.BucketType.guild)
     async def purge(self, ctx, amount: int):

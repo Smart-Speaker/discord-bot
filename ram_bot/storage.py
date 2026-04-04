@@ -60,6 +60,7 @@ class UserProfileStore(JsonStore):
                 "last_daily": None,
                 "last_checkin": None,
                 "last_dailyhug": None,
+                "daily_streak": 0,
                 "last_xp_at": None,
                 "last_roleplay_at": None,
                 "last_roleplay_action": None,

@@ -19,8 +19,8 @@ def format_command_rows(commands: tuple[CommandInfo, ...], per_row: int = 3, lim
     return "\n".join(rows)
 
 
-def build_help_embed(prefix: str, include_management: bool) -> discord.Embed:
-    categories = list(get_categories(include_management))
+def build_help_embed(prefix: str, include_management: bool, include_admin_tools: bool = False) -> discord.Embed:
+    categories = list(get_categories(include_management, include_admin_tools))
 
     embed = discord.Embed(
         title="Help Menu - Ram's Guide For Beginners",
@@ -63,8 +63,8 @@ def build_help_embed(prefix: str, include_management: bool) -> discord.Embed:
     return embed
 
 
-def build_help_pages(prefix: str, include_management: bool) -> list[discord.Embed]:
-    categories = list(get_categories(include_management))
+def build_help_pages(prefix: str, include_management: bool, include_admin_tools: bool = False) -> list[discord.Embed]:
+    categories = list(get_categories(include_management, include_admin_tools))
     overview = discord.Embed(
         title="Help Menu - Ram's Guide For Beginners",
         description=(

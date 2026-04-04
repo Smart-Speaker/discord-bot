@@ -5,10 +5,18 @@ OTAKU_GIFS_API_URL = "https://api.otakugifs.xyz/gif?reaction={reaction}"
 ROLEPLAY_REACTIONS = {
     "bite": "bite",
     "blush": "blush",
+    "celebrate": "celebrate",
     "cuddle": "cuddle",
     "evillaugh": "evillaugh",
+    "happy": "happy",
+    "handhold": "handhold",
+    "nuzzle": "nuzzle",
+    "poke": "poke",
     "pout": "pout",
+    "smile": "smile",
     "smug": "smug",
+    "thumbsup": "thumbsup",
+    "yay": "yay",
     "hug": "hug",
     "kiss": "kiss",
     "laugh": "laugh",
@@ -29,6 +37,11 @@ ROLEPLAY_GIFS = {
         "https://media.tenor.com/iw4V3N1M0z4AAAAC/anime-girl-blush.gif",
         "https://media.tenor.com/t6zD0m8d8fAAAAAC/blush-anime.gif",
     ),
+    "celebrate": (
+        "https://media.tenor.com/sECMC8L4g2gAAAAC/anime-celebrate.gif",
+        "https://media.tenor.com/ckKfPa6Xx1IAAAAC/anime-happy.gif",
+        "https://media.tenor.com/pV5HkG7Hh9EAAAAC/anime-yay.gif",
+    ),
     "cuddle": (
         "https://media.tenor.com/8Q5P8mM3xV0AAAAC/anime-cuddle.gif",
         "https://media.tenor.com/um1xqkRjVn8AAAAC/cuddle-anime.gif",
@@ -38,6 +51,16 @@ ROLEPLAY_GIFS = {
         "https://media.tenor.com/0avLz4cJc98AAAAC/anime-evil-laugh.gif",
         "https://media.tenor.com/F_dz9wA5kXEAAAAC/anime-laugh.gif",
         "https://media.tenor.com/RmRmN6v8vVgAAAAC/evil-laugh-anime.gif",
+    ),
+    "happy": (
+        "https://media.tenor.com/xDx7m7wW5V0AAAAC/anime-happy.gif",
+        "https://media.tenor.com/ckKfPa6Xx1IAAAAC/anime-happy.gif",
+        "https://media.tenor.com/SpRYC79Qf7YAAAAC/anime-girl-happy.gif",
+    ),
+    "handhold": (
+        "https://media.tenor.com/7M2jvS9fWbAAAAAC/anime-hand-hold.gif",
+        "https://media.tenor.com/o3xN4b4x2e4AAAAC/holding-hands-anime.gif",
+        "https://media.tenor.com/4F4xM1TrxL8AAAAC/anime-love.gif",
     ),
     "hug": (
         "https://c.tenor.com/yc_shX2Xl_QAAAAd/girl-anime.gif",
@@ -59,15 +82,35 @@ ROLEPLAY_GIFS = {
         "https://media.tenor.com/Vq8m2D4M0JIAAAAC/pat-anime.gif",
         "https://media.tenor.com/oGb8d2iKReAAAAAC/anime-head-pat.gif",
     ),
+    "poke": (
+        "https://media.tenor.com/8BnhwZ8xQnsAAAAC/anime-poke.gif",
+        "https://media.tenor.com/9vK4Qfdrq2MAAAAC/poke-anime.gif",
+        "https://media.tenor.com/LxggFGJkVvIAAAAC/anime-poking.gif",
+    ),
+    "nuzzle": (
+        "https://media.tenor.com/5z6xQ0t1G8QAAAAC/anime-nuzzle.gif",
+        "https://media.tenor.com/0M6fI8kTL2UAAAAC/nuzzle-anime.gif",
+        "https://media.tenor.com/y8O2Y7g1gwsAAAAC/anime-cute.gif",
+    ),
     "pout": (
         "https://media.tenor.com/P6mV7A7uI5AAAAAC/anime-pout.gif",
         "https://media.tenor.com/OV6Y6QYHjDwAAAAC/pouting-anime.gif",
         "https://media.tenor.com/r7n5Xv3w7vQAAAAC/anime-angry-cute.gif",
     ),
+    "smile": (
+        "https://media.tenor.com/3a7dG6PjK2cAAAAC/anime-smile.gif",
+        "https://media.tenor.com/0mP4m4zK4dIAAAAC/anime-girl-smile.gif",
+        "https://media.tenor.com/xDx7m7wW5V0AAAAC/anime-happy.gif",
+    ),
     "smug": (
         "https://media.tenor.com/2w1x5z1t2yUAAAAC/anime-smug.gif",
         "https://media.tenor.com/e0R4l4Rj9Q8AAAAC/smug-anime.gif",
         "https://media.tenor.com/1A3P5bKQ2LIAAAAC/anime-girl-smirk.gif",
+    ),
+    "thumbsup": (
+        "https://media.tenor.com/6nPfz7A4LhEAAAAC/anime-thumbs-up.gif",
+        "https://media.tenor.com/KuF0L2uv7lUAAAAC/anime-approval.gif",
+        "https://media.tenor.com/EoAbsoXHpcEAAAAC/anime-okay.gif",
     ),
     "glare": (
         "https://media.tenor.com/BqoWg6Ogm8sAAAAC/anime-angry.gif",
@@ -83,6 +126,11 @@ ROLEPLAY_GIFS = {
         "https://media.tenor.com/8fK4hM7YQfQAAAAC/anime-wave.gif",
         "https://media.tenor.com/r4k7pY5Vx6IAAAAC/wave-anime.gif",
         "https://media.tenor.com/pQ0k6kN7e4UAAAAC/anime-hello.gif",
+    ),
+    "yay": (
+        "https://media.tenor.com/pV5HkG7Hh9EAAAAC/anime-yay.gif",
+        "https://media.tenor.com/0zQwSh8Qxg4AAAAC/anime-celebration.gif",
+        "https://media.tenor.com/1euVYk8v67cAAAAC/anime-excited.gif",
     ),
 }
 
@@ -233,6 +281,31 @@ REPEAT_MESSAGE_LIMIT = 3
 XP_PER_MESSAGE_RANGE = (8, 15)
 DAILY_XP_REWARD = 120
 DAILY_AFFINITY_REWARD = 8
+CHECKIN_XP_REWARD = 18
 CHECKIN_AFFINITY_REWARD = 3
+DAILY_HUG_XP_REWARD = 10
 DAILY_HUG_AFFINITY_REWARD = 5
+STREAK_BONUS_XP = 40
+STREAK_MILESTONE = 3
+FLAT_LEVEL_START = 50
+FLAT_LEVEL_XP = 2550
+LEVEL_MILESTONES = (5, 10, 20, 50, 100, 200, 500, 1000)
 RARE_RESPONSE_CHANCE = 0.01
+
+DAILY_REWARD_LINES = (
+    "Ram prepared your daily reward. Try to make it worth the effort.",
+    "Here. Your daily allotment. Don't squander it immediately.",
+    "Ram handled the routine again. You're welcome, I suppose.",
+)
+
+CHECKIN_LINES = (
+    "Ram has noted your presence. Try to remain useful.",
+    "Checked in already? Hmph. At least that's something.",
+    "Ram marked you as present. Don't make that a mistake.",
+)
+
+DAILY_HUG_LINES = (
+    "A daily hug from Ram. Don't start expecting tenderness on demand.",
+    "Ram allowed a brief hug. That is more than enough for one day.",
+    "You get one proper hug today. Try not to look too pleased.",
+)

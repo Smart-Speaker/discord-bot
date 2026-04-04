@@ -15,6 +15,7 @@ from ram_bot.constants import (
     SPAM_MESSAGE_LIMIT,
     SPAM_WINDOW_SECONDS,
 )
+from ram_bot.embeds import brand_color
 from ram_bot.timeparse import parse_duration
 
 
@@ -70,7 +71,7 @@ class AutomodCog(commands.Cog):
 
     @commands.command()
     @commands.guild_only()
-    @commands.has_permissions(moderate_members=True)
+    @commands.has_permissions(administrator=True)
     @commands.cooldown(1, 5, commands.BucketType.guild)
     async def warn(self, ctx, member: discord.Member, *, reason: str = "No reason provided"):
         result = await self.add_warning(ctx.guild, member, reason)
@@ -78,7 +79,7 @@ class AutomodCog(commands.Cog):
 
     @commands.command()
     @commands.guild_only()
-    @commands.has_permissions(moderate_members=True)
+    @commands.has_permissions(administrator=True)
     @commands.cooldown(1, 5, commands.BucketType.guild)
     async def warnings(self, ctx, member: discord.Member):
         profile = self.profile(ctx.guild.id, member.id)
@@ -90,12 +91,12 @@ class AutomodCog(commands.Cog):
             f"`#{index}` {entry['reason']} ({discord.utils.format_dt(datetime.fromisoformat(entry['at']), style='R')})"
             for index, entry in enumerate(warnings[-10:], start=max(1, len(warnings) - 9))
         ]
-        embed = discord.Embed(title=f"Warnings - {member.display_name}", description="\n".join(lines), color=discord.Color.orange())
+        embed = discord.Embed(title=f"Warnings - {member.display_name}", description="\n".join(lines), color=brand_color())
         await ctx.send(embed=embed)
 
     @commands.command()
     @commands.guild_only()
-    @commands.has_permissions(moderate_members=True)
+    @commands.has_permissions(administrator=True)
     @commands.cooldown(1, 5, commands.BucketType.guild)
     async def timeout(self, ctx, member: discord.Member, duration: str, *, reason: str = "No reason provided"):
         delta = parse_duration(duration)
@@ -108,7 +109,7 @@ class AutomodCog(commands.Cog):
 
     @commands.command()
     @commands.guild_only()
-    @commands.has_permissions(manage_guild=True)
+    @commands.has_permissions(administrator=True)
     async def whitelistdomain(self, ctx, domain: str):
         domain = domain.lower().strip()
         settings = self.settings(ctx.guild.id)
@@ -119,7 +120,7 @@ class AutomodCog(commands.Cog):
 
     @commands.command()
     @commands.guild_only()
-    @commands.has_permissions(manage_guild=True)
+    @commands.has_permissions(administrator=True)
     async def unwhitelistdomain(self, ctx, domain: str):
         domain = domain.lower().strip()
         settings = self.settings(ctx.guild.id)
@@ -130,20 +131,21 @@ class AutomodCog(commands.Cog):
 
     @commands.command()
     @commands.guild_only()
+    @commands.has_permissions(administrator=True)
     async def whitelistdomains(self, ctx):
         domains = sorted(self.whitelist(ctx.guild.id))
         await ctx.send("\n".join(f"`{domain}`" for domain in domains[:50]))
 
     @commands.command()
     @commands.guild_only()
-    @commands.has_permissions(manage_guild=True)
+    @commands.has_permissions(administrator=True)
     async def setwarningthreshold(self, ctx, count: int):
         self.bot.settings.update_guild(ctx.guild.id, warning_threshold=max(1, count))
         await ctx.send(f"Automatic punishment will trigger after `{max(1, count)}` warnings.")
 
     @commands.command()
     @commands.guild_only()
-    @commands.has_permissions(manage_guild=True)
+    @commands.has_permissions(administrator=True)
     async def setautotimeout(self, ctx, minutes: int):
         self.bot.settings.update_guild(ctx.guild.id, auto_timeout_minutes=max(1, minutes))
         await ctx.send(f"Automatic timeouts will last `{max(1, minutes)}` minutes.")

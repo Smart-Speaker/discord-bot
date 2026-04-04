@@ -30,17 +30,21 @@ GENERAL_CATEGORY = CategoryInfo(
 ROLEPLAY_CATEGORY = CategoryInfo(
     name="Roleplay",
     label="Roleplay",
-    summary="Cute reaction commands with anime GIFs.",
+    summary="Cute reaction commands with anime GIFs and little Ram-style interactions.",
     commands=(
-        CommandInfo("hug", "hug [@user]", "Send a soft anime hug."),
-        CommandInfo("kiss", "kiss [@user]", "Send a sweet anime kiss."),
-        CommandInfo("laugh", "laugh [@user]", "Show a cheerful laughing reaction, or laugh with someone."),
+        CommandInfo("hug", "hug [@user]", "Have Ram send a soft anime hug to someone, or to you by default."),
+        CommandInfo("kiss", "kiss [@user]", "Send a sweet anime kiss reaction."),
+        CommandInfo("laugh", "laugh [@user]", "Laugh on your own, or laugh with someone."),
         CommandInfo("pat", "pat [@user]", "Give someone a cute head pat."),
         CommandInfo("cuddle", "cuddle [@user]", "Wrap someone up in a cozy cuddle."),
         CommandInfo("wave", "wave [@user]", "Send a friendly anime wave."),
-        CommandInfo("blush", "blush [@user]", "Show a shy blushing reaction, or blush at someone."),
+        CommandInfo("blush", "blush [@user]", "Blush on your own, or blush at someone."),
+        CommandInfo("handhold", "handhold [@user]", "Reach out and hold someone's hand."),
+        CommandInfo("poke", "poke [@user]", "Poke someone for attention."),
+        CommandInfo("nuzzle", "nuzzle [@user]", "Nuzzle up to someone in a cute way."),
+        CommandInfo("smile", "smile [@user]", "Smile softly, or smile at someone."),
         CommandInfo("glare", "glare [@user]", "Give someone a dramatic anime stare."),
-        CommandInfo("cry", "cry [@user]", "Show a sad crying reaction, or cry with someone."),
+        CommandInfo("cry", "cry [@user]", "Cry on your own, or cry with someone."),
     ),
 )
 
@@ -84,13 +88,15 @@ SERVER_CATEGORY = CategoryInfo(
 PROGRESSION_CATEGORY = CategoryInfo(
     name="Progression",
     label="Progression",
-    summary="XP, affinity, leveling, daily rewards, and rankings.",
+    summary="XP, affinity, streaks, daily routines, and Ram's opinion of you.",
     commands=(
         CommandInfo("rank", "rank [@user]", "Show a user's XP, level, and affinity with Ram."),
+        CommandInfo("affinity", "affinity [@user]", "See how warm or cold Ram currently feels toward someone."),
         CommandInfo("leaderboard", "leaderboard", "Show the top users by XP in this server."),
-        CommandInfo("daily", "daily", "Claim a daily XP and affinity reward."),
-        CommandInfo("checkin", "checkin", "Check in with Ram for a small affinity boost."),
-        CommandInfo("dailyhug", "dailyhug", "Get a daily affectionate interaction from Ram."),
+        CommandInfo("streak", "streak [@user]", "Show a user's current daily reward streak and next bonus milestone."),
+        CommandInfo("daily", "daily", "Claim your main daily reward, build your streak, and earn milestone bonuses."),
+        CommandInfo("checkin", "checkin", "Report in to Ram for a smaller repeatable XP and affinity boost."),
+        CommandInfo("dailyhug", "dailyhug", "Receive one daily hug from Ram for a softer affection-focused bonus."),
         CommandInfo("setlevelrole", "setlevelrole <level> @role", "Give a role automatically at a specific level."),
         CommandInfo("clearlevelrole", "clearlevelrole <level>", "Remove a configured level reward role."),
     ),
@@ -124,32 +130,32 @@ MANAGEMENT_CATEGORY = CategoryInfo(
 )
 
 
-def get_categories(include_management: bool) -> tuple[CategoryInfo, ...]:
+def get_categories(include_management: bool, include_admin_tools: bool = False) -> tuple[CategoryInfo, ...]:
     categories = [
         GENERAL_CATEGORY,
         ROLEPLAY_CATEGORY,
-        MODERATION_CATEGORY,
-        SERVER_CATEGORY,
         PROGRESSION_CATEGORY,
         UTILITY_CATEGORY,
     ]
+    if include_admin_tools:
+        categories.extend([MODERATION_CATEGORY, SERVER_CATEGORY])
     if include_management:
         categories.append(MANAGEMENT_CATEGORY)
     return tuple(categories)
 
 
-def find_command(query: str, include_management: bool) -> CommandInfo | None:
+def find_command(query: str, include_management: bool, include_admin_tools: bool = False) -> CommandInfo | None:
     lowered = query.lower()
-    for category in get_categories(include_management):
+    for category in get_categories(include_management, include_admin_tools):
         for command in category.commands:
             if command.name == lowered:
                 return command
     return None
 
 
-def find_category(query: str, include_management: bool) -> CategoryInfo | None:
+def find_category(query: str, include_management: bool, include_admin_tools: bool = False) -> CategoryInfo | None:
     lowered = query.lower()
-    for category in get_categories(include_management):
+    for category in get_categories(include_management, include_admin_tools):
         if category.name.lower() == lowered:
             return category
     return None
