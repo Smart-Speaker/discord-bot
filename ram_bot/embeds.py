@@ -11,21 +11,36 @@ def brand_color() -> discord.Color:
 def build_help_embed(prefix: str, include_management: bool) -> discord.Embed:
     embed = discord.Embed(
         title="Help Menu - Ram's Guide For Beginners",
-        description="Here are all my commands hope this helps!",
+        description=(
+            "Here are all my commands. Pick a category below, or use "
+            f"`{prefix}help <command>` for more detail."
+        ),
         color=brand_color(),
     )
     embed.add_field(name="Prefix", value=f"`{prefix}`", inline=False)
 
     for category in get_categories(include_management):
-        command_list = ", ".join(f"`{prefix}{command.name}`" for command in category.commands)
-        embed.add_field(name=category.name, value=command_list, inline=True)
+        command_list = ", ".join(f"`{command.name}`" for command in category.commands)
+        embed.add_field(
+            name=f"{category.emoji} {category.name}",
+            value=f"{category.summary}\n{command_list}",
+            inline=False,
+        )
 
     if not include_management:
-        embed.add_field(name="Management", value="Owner-only commands are hidden.", inline=True)
+        embed.add_field(
+            name="⚙️ Management",
+            value="Owner-only commands are hidden until OWNER_ID is configured.",
+            inline=False,
+        )
 
     embed.add_field(
-        name="Using Commands",
-        value=f"To view further information on how to use any command, use `{prefix}help <command>`.",
+        name="Examples",
+        value=(
+            f"`{prefix}help roleplay`\n"
+            f"`{prefix}help hug`\n"
+            f"`{prefix}hug @user`"
+        ),
         inline=False,
     )
     embed.set_image(url=HELP_GIF_URL)
@@ -36,16 +51,18 @@ def build_help_embed(prefix: str, include_management: bool) -> discord.Embed:
 def build_command_help_embed(prefix: str, command: CommandInfo) -> discord.Embed:
     embed = discord.Embed(
         title=f"Command Help - {command.name}",
+        description=command.description,
         color=brand_color(),
     )
     embed.add_field(name="Usage", value=f"`{prefix}{command.usage}`", inline=False)
-    embed.add_field(name="Description", value=command.description, inline=False)
+    embed.add_field(name="Category Tip", value=f"Use `{prefix}help` to open the full menu.", inline=False)
     return embed
 
 
 def build_category_help_embed(prefix: str, category: CategoryInfo) -> discord.Embed:
     embed = discord.Embed(
-        title=f"{category.name} Commands",
+        title=f"{category.emoji} {category.name} Commands",
+        description=category.summary,
         color=brand_color(),
     )
     for command in category.commands:
@@ -54,6 +71,7 @@ def build_category_help_embed(prefix: str, category: CategoryInfo) -> discord.Em
             value=f"{command.description}\nUsage: `{prefix}{command.usage}`",
             inline=False,
         )
+    embed.set_footer(text=f"Use {prefix}help <command> for individual command help.")
     return embed
 
 

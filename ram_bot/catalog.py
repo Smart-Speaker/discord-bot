@@ -11,11 +11,15 @@ class CommandInfo:
 @dataclass(frozen=True)
 class CategoryInfo:
     name: str
+    emoji: str
+    summary: str
     commands: tuple[CommandInfo, ...]
 
 
 GENERAL_CATEGORY = CategoryInfo(
     name="General",
+    emoji="🛠️",
+    summary="Core bot commands and help tools.",
     commands=(
         CommandInfo("help", "help [command/category]", "Show the help menu or details for a command."),
         CommandInfo("ping", "ping", "Check whether the bot is online."),
@@ -25,6 +29,8 @@ GENERAL_CATEGORY = CategoryInfo(
 
 ROLEPLAY_CATEGORY = CategoryInfo(
     name="Roleplay",
+    emoji="🌸",
+    summary="Cute reaction commands with anime GIFs.",
     commands=(
         CommandInfo("hug", "hug [@user]", "Send a hug embed."),
         CommandInfo("kiss", "kiss [@user]", "Send a kiss embed."),
@@ -37,6 +43,8 @@ ROLEPLAY_CATEGORY = CategoryInfo(
 
 MODERATION_CATEGORY = CategoryInfo(
     name="Moderation",
+    emoji="🛡️",
+    summary="Server moderation and cleanup tools.",
     commands=(
         CommandInfo("kick", "kick @user [reason]", "Kick a member from the server."),
         CommandInfo("ban", "ban @user [reason]", "Ban a member from the server."),
@@ -47,6 +55,8 @@ MODERATION_CATEGORY = CategoryInfo(
 
 MANAGEMENT_CATEGORY = CategoryInfo(
     name="Management",
+    emoji="⚙️",
+    summary="Owner-only bot controls and diagnostics.",
     commands=(
         CommandInfo("status", "status", "Show bot and hosting status."),
         CommandInfo("whoami", "whoami", "Show your Discord user ID."),

@@ -1,4 +1,5 @@
 import discord
+import random
 from discord.ext import commands
 
 from ram_bot.constants import ROLEPLAY_GIFS
@@ -8,6 +9,9 @@ from ram_bot.embeds import build_action_embed
 class RoleplayCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+
+    def get_gif(self, action_name: str) -> str:
+        return random.choice(ROLEPLAY_GIFS[action_name])
 
     async def send_target_action(self, ctx, member: discord.Member | None, action_name: str, description: str):
         target = member or ctx.author
@@ -20,7 +24,7 @@ class RoleplayCog(commands.Cog):
                 target=target.mention,
                 target_name=target.display_name,
             ),
-            gif_url=ROLEPLAY_GIFS[action_name],
+            gif_url=self.get_gif(action_name),
         )
         await ctx.send(embed=embed)
 
@@ -48,7 +52,7 @@ class RoleplayCog(commands.Cog):
             ctx,
             title=f"{ctx.author.display_name} is laughing",
             description=f"{ctx.author.mention} is having a great time.",
-            gif_url=ROLEPLAY_GIFS["laugh"],
+            gif_url=self.get_gif("laugh"),
         )
         await ctx.send(embed=embed)
 
@@ -76,7 +80,7 @@ class RoleplayCog(commands.Cog):
             ctx,
             title=f"{ctx.author.display_name} is crying",
             description=f"{ctx.author.mention} needs a little comfort right now.",
-            gif_url=ROLEPLAY_GIFS["cry"],
+            gif_url=self.get_gif("cry"),
         )
         await ctx.send(embed=embed)
 
