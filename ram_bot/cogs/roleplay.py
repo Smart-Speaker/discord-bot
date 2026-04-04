@@ -1,9 +1,7 @@
 import discord
-import random
 from datetime import datetime, timezone
 from discord.ext import commands
 
-from ram_bot.constants import AFFINITY_REPLIES, RARE_RESPONSE_CHANCE, RARE_ROLEPLAY_REPLIES, ROLEPLAY_COMBOS
 from ram_bot.embeds import build_action_embed
 from ram_bot.reactions import get_reaction_gif
 
@@ -15,42 +13,21 @@ class RoleplayCog(commands.Cog):
     def get_profile(self, guild_id: int, user_id: int) -> dict:
         return self.bot.user_profiles.get_profile(f"guild:{guild_id}", user_id)
 
-    def affinity_tier(self, affinity: int) -> str:
-        if affinity >= 150:
-            return "close"
-        if affinity >= 75:
-            return "warm"
-        if affinity >= 25:
-            return "neutral"
-        return "cold"
-
     async def post_roleplay_bonus(self, ctx, action_name: str):
         if ctx.guild is None:
             return
         profile = self.get_profile(ctx.guild.id, ctx.author.id)
         now = datetime.now(timezone.utc)
-        previous_action = profile.get("last_roleplay_action")
         previous_at_raw = profile.get("last_roleplay_at")
         if previous_at_raw:
             previous_at = datetime.fromisoformat(previous_at_raw)
             if (now - previous_at).total_seconds() > 600:
-                previous_action = None
-        sequence = [entry for entry in (previous_action, action_name) if entry]
-        combo_reply = ROLEPLAY_COMBOS.get(tuple(sequence))
-        if previous_action == "hug" and action_name == "cuddle":
-            combo_reply = ROLEPLAY_COMBOS.get(("hug", "blush", "cuddle"), combo_reply)
+                profile["last_roleplay_action"] = None
 
         profile["affinity"] += 1
         profile["last_roleplay_action"] = action_name
         profile["last_roleplay_at"] = now.isoformat()
         self.bot.user_profiles.save_profile(f"guild:{ctx.guild.id}", ctx.author.id, profile)
-
-        if combo_reply:
-            await ctx.send(combo_reply)
-        elif random.random() < RARE_RESPONSE_CHANCE:
-            await ctx.send(random.choice(RARE_ROLEPLAY_REPLIES))
-        elif action_name in {"hug", "cuddle", "blush"}:
-            await ctx.send(random.choice(AFFINITY_REPLIES[self.affinity_tier(profile["affinity"])]))
 
     async def send_self_action(self, ctx, action_name: str, title: str, description: str):
         gif_url = await get_reaction_gif(action_name)
@@ -110,6 +87,19 @@ class RoleplayCog(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1, 4, commands.BucketType.user)
+    async def airkiss(self, ctx, member: discord.Member | None = None):
+        await self.send_target_action(
+            ctx,
+            member,
+            "airkiss",
+            "{author_name} blew a kiss to {target_name}",
+            "{source_name} blew a kiss to {target_name}",
+            "{target} got an air kiss from {author_name}.",
+            "{target} got an air kiss from {source_name}.",
+        )
+
+    @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
     async def kiss(self, ctx, member: discord.Member | None = None):
         await self.send_target_action(
             ctx,
@@ -162,6 +152,32 @@ class RoleplayCog(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1, 4, commands.BucketType.user)
+    async def cheers(self, ctx, member: discord.Member | None = None):
+        await self.send_target_action(
+            ctx,
+            member,
+            "cheers",
+            "{author_name} clinked glasses with {target_name}",
+            "{source_name} clinked glasses with {target_name}",
+            "{target} shared a cheerful toast with {author_name}.",
+            "{target} shared a cheerful toast with {source_name}.",
+        )
+
+    @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def clap(self, ctx, member: discord.Member | None = None):
+        await self.send_target_action(
+            ctx,
+            member,
+            "clap",
+            "{author_name} applauded {target_name}",
+            "{source_name} applauded {target_name}",
+            "{target} is being applauded by {author_name}.",
+            "{target} is being applauded by {source_name}.",
+        )
+
+    @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
     async def handhold(self, ctx, member: discord.Member | None = None):
         await self.send_target_action(
             ctx,
@@ -201,6 +217,19 @@ class RoleplayCog(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1, 4, commands.BucketType.user)
+    async def tickle(self, ctx, member: discord.Member | None = None):
+        await self.send_target_action(
+            ctx,
+            member,
+            "tickle",
+            "{author_name} tickled {target_name}",
+            "{source_name} tickled {target_name}",
+            "{target} is being tickled by {author_name}.",
+            "{target} is being tickled by {source_name}.",
+        )
+
+    @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
     async def wave(self, ctx, member: discord.Member | None = None):
         await self.send_target_action(
             ctx,
@@ -227,6 +256,19 @@ class RoleplayCog(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1, 4, commands.BucketType.user)
+    async def shy(self, ctx, member: discord.Member | None = None):
+        await self.send_target_action(
+            ctx,
+            member,
+            "shy",
+            "{author_name} looked shy around {target_name}",
+            "{source_name} looked shy around {target_name}",
+            "{author} is acting shy around {target}.",
+            "{target} made {source_name} act unexpectedly shy.",
+        )
+
+    @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
     async def blush(self, ctx, member: discord.Member | None = None):
         await self.send_target_action(
             ctx,
@@ -249,6 +291,19 @@ class RoleplayCog(commands.Cog):
             "{source_name} glared at {target_name}",
             "{author_name} is glaring at {target}.",
             "{source_name} is glaring at {target}.",
+        )
+
+    @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def lick(self, ctx, member: discord.Member | None = None):
+        await self.send_target_action(
+            ctx,
+            member,
+            "lick",
+            "{author_name} licked {target_name}",
+            "{source_name} licked {target_name}",
+            "{target} got licked by {author_name}.",
+            "{target} got licked by {source_name}.",
         )
 
     @commands.command()

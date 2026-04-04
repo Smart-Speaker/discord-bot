@@ -3,19 +3,25 @@ GUILD_JOIN_GIF_URL = "https://media.tenor.com/gSGAezNE6SoAAAAC/re-zero-ram.gif"
 OTAKU_GIFS_API_URL = "https://api.otakugifs.xyz/gif?reaction={reaction}"
 
 ROLEPLAY_REACTIONS = {
+    "airkiss": "airkiss",
     "bite": "bite",
     "blush": "blush",
     "celebrate": "celebrate",
+    "cheers": "cheers",
+    "clap": "clap",
     "cuddle": "cuddle",
     "evillaugh": "evillaugh",
     "happy": "happy",
     "handhold": "handhold",
+    "lick": "lick",
     "nuzzle": "nuzzle",
     "poke": "poke",
     "pout": "pout",
+    "shy": "shy",
     "smile": "smile",
     "smug": "smug",
     "thumbsup": "thumbsup",
+    "tickle": "tickle",
     "yay": "yay",
     "hug": "hug",
     "kiss": "kiss",
@@ -27,6 +33,11 @@ ROLEPLAY_REACTIONS = {
 }
 
 ROLEPLAY_GIFS = {
+    "airkiss": (
+        "https://media.tenor.com/fsm4VtL9nLMAAAAC/anime-kiss-airkiss.gif",
+        "https://media.tenor.com/NTb0S4yN0mYAAAAC/anime-air-kiss.gif",
+        "https://media.tenor.com/eaP8g8A9L5YAAAAC/anime-blow-kiss.gif",
+    ),
     "bite": (
         "https://media.tenor.com/Mn0i9qz4U6oAAAAC/anime-bite.gif",
         "https://media.tenor.com/J4qjpk9z_B8AAAAC/anime-bite-love.gif",
@@ -41,6 +52,16 @@ ROLEPLAY_GIFS = {
         "https://media.tenor.com/sECMC8L4g2gAAAAC/anime-celebrate.gif",
         "https://media.tenor.com/ckKfPa6Xx1IAAAAC/anime-happy.gif",
         "https://media.tenor.com/pV5HkG7Hh9EAAAAC/anime-yay.gif",
+    ),
+    "cheers": (
+        "https://media.tenor.com/lLJZRWl1m2cAAAAC/anime-cheers.gif",
+        "https://media.tenor.com/ZpwIOs58x2UAAAAC/anime-toast.gif",
+        "https://media.tenor.com/1X0u55x8h3IAAAAC/anime-drink-cheers.gif",
+    ),
+    "clap": (
+        "https://media.tenor.com/8i_SdVfB3HEAAAAC/anime-clap.gif",
+        "https://media.tenor.com/SFkx8yP3M1cAAAAC/anime-applause.gif",
+        "https://media.tenor.com/Cm0oVq7F0XsAAAAC/anime-slow-clap.gif",
     ),
     "cuddle": (
         "https://media.tenor.com/8Q5P8mM3xV0AAAAC/anime-cuddle.gif",
@@ -72,6 +93,11 @@ ROLEPLAY_GIFS = {
         "https://media.tenor.com/b7LZl8R9a7QAAAAC/anime-kiss.gif",
         "https://media.tenor.com/Gq0T8n9B4J4AAAAC/anime-love.gif",
     ),
+    "lick": (
+        "https://media.tenor.com/6VxRk0n9l6YAAAAC/anime-lick.gif",
+        "https://media.tenor.com/0hNUNpL4zjAAAAAC/anime-licking.gif",
+        "https://media.tenor.com/65ywxyM8cvgAAAAC/anime-cute-lick.gif",
+    ),
     "laugh": (
         "https://media.tenor.com/QJjJ7Oy5stoAAAAC/anime-laugh.gif",
         "https://media.tenor.com/4bC9P1J6eK8AAAAC/anime-girl-laugh.gif",
@@ -97,6 +123,11 @@ ROLEPLAY_GIFS = {
         "https://media.tenor.com/OV6Y6QYHjDwAAAAC/pouting-anime.gif",
         "https://media.tenor.com/r7n5Xv3w7vQAAAAC/anime-angry-cute.gif",
     ),
+    "shy": (
+        "https://media.tenor.com/FxJ6cS5gihwAAAAC/anime-shy.gif",
+        "https://media.tenor.com/H2mKz1PqWJIAAAAC/anime-girl-shy.gif",
+        "https://media.tenor.com/m1WvO8H6B8AAAAAC/anime-embarrassed.gif",
+    ),
     "smile": (
         "https://media.tenor.com/3a7dG6PjK2cAAAAC/anime-smile.gif",
         "https://media.tenor.com/0mP4m4zK4dIAAAAC/anime-girl-smile.gif",
@@ -111,6 +142,11 @@ ROLEPLAY_GIFS = {
         "https://media.tenor.com/6nPfz7A4LhEAAAAC/anime-thumbs-up.gif",
         "https://media.tenor.com/KuF0L2uv7lUAAAAC/anime-approval.gif",
         "https://media.tenor.com/EoAbsoXHpcEAAAAC/anime-okay.gif",
+    ),
+    "tickle": (
+        "https://media.tenor.com/oXJ3J7r1MVoAAAAC/anime-tickle.gif",
+        "https://media.tenor.com/hcAd6Bb5E3YAAAAC/anime-laugh-tickle.gif",
+        "https://media.tenor.com/kwk9k3rUYxIAAAAC/anime-playing.gif",
     ),
     "glare": (
         "https://media.tenor.com/BqoWg6Ogm8sAAAAC/anime-angry.gif",
