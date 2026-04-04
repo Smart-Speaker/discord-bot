@@ -28,13 +28,23 @@ class ModerationCog(commands.Cog):
         )
         await ctx.send(embed=embed)
 
+    async def send_self_removal_embed(self, ctx, action: str):
+        gif_url = await get_reaction_gif("glare")
+        embed = build_action_embed(
+            ctx,
+            title=f"{ctx.author.display_name} tried to {action} themselves",
+            description=random.choice(SELF_REMOVAL_MESSAGES),
+            gif_url=gif_url,
+        )
+        await ctx.send(embed=embed)
+
     @commands.command()
     @commands.has_permissions(administrator=True)
     @commands.guild_only()
     @commands.cooldown(1, 5, commands.BucketType.guild)
     async def kick(self, ctx, member: discord.Member, *, reason: str = "No reason provided"):
         if member == ctx.author:
-            await ctx.send(random.choice(SELF_REMOVAL_MESSAGES))
+            await self.send_self_removal_embed(ctx, "kick")
             return
         if member == ctx.guild.me:
             await ctx.send("I cannot kick myself.")
@@ -54,7 +64,7 @@ class ModerationCog(commands.Cog):
     @commands.cooldown(1, 5, commands.BucketType.guild)
     async def ban(self, ctx, member: discord.Member, *, reason: str = "No reason provided"):
         if member == ctx.author:
-            await ctx.send(random.choice(SELF_REMOVAL_MESSAGES))
+            await self.send_self_removal_embed(ctx, "ban")
             return
         if member == ctx.guild.me:
             await ctx.send("I cannot ban myself.")

@@ -17,6 +17,7 @@ ROLEPLAY_REACTIONS = {
     "nuzzle": "nuzzle",
     "poke": "poke",
     "pout": "pout",
+    "sad": "sad",
     "shy": "shy",
     "smile": "smile",
     "smug": "smug",
@@ -122,6 +123,11 @@ ROLEPLAY_GIFS = {
         "https://media.tenor.com/P6mV7A7uI5AAAAAC/anime-pout.gif",
         "https://media.tenor.com/OV6Y6QYHjDwAAAAC/pouting-anime.gif",
         "https://media.tenor.com/r7n5Xv3w7vQAAAAC/anime-angry-cute.gif",
+    ),
+    "sad": (
+        "https://media.tenor.com/uJm1O3k2Y9QAAAAC/anime-sad.gif",
+        "https://media.tenor.com/v7v3Vh8M6V0AAAAC/anime-cry.gif",
+        "https://media.tenor.com/6kAO6lk6K7MAAAAC/anime-girl-cry.gif",
     ),
     "shy": (
         "https://media.tenor.com/FxJ6cS5gihwAAAAC/anime-shy.gif",

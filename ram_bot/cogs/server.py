@@ -3,6 +3,7 @@ from discord.ext import commands
 
 from ram_bot.constants import DEFAULT_AUTO_TIMEOUT_MINUTES, DEFAULT_DOMAIN_WHITELIST, DEFAULT_WARNING_THRESHOLD, GUILD_JOIN_GIF_URL
 from ram_bot.embeds import brand_color
+from ram_bot.reactions import get_reaction_gif
 
 DEFAULT_WELCOME_TEMPLATE = "Welcome {user} to {server}!"
 DEFAULT_GOODBYE_TEMPLATE = "Goodbye {username}."
@@ -33,6 +34,17 @@ class ServerCog(commands.Cog):
             server=member.guild.name,
             count=member.guild.member_count,
         )
+
+    async def send_member_embed(self, channel: discord.abc.Messageable, *, title: str, description: str, reaction: str, member: discord.Member):
+        embed = discord.Embed(
+            title=title,
+            description=description,
+            color=brand_color(),
+            timestamp=discord.utils.utcnow(),
+        )
+        embed.set_thumbnail(url=member.display_avatar.url)
+        embed.set_image(url=await get_reaction_gif(reaction))
+        await channel.send(embed=embed)
 
     @commands.command()
     @commands.guild_only()
@@ -198,7 +210,13 @@ class ServerCog(commands.Cog):
         if channel_id and template:
             channel = member.guild.get_channel(channel_id)
             if channel is not None:
-                await channel.send(self.format_message(template, member))
+                await self.send_member_embed(
+                    channel,
+                    title="Welcome",
+                    description=self.format_message(template, member),
+                    reaction="wave",
+                    member=member,
+                )
 
     @commands.Cog.listener()
     async def on_member_remove(self, member: discord.Member):
@@ -208,7 +226,13 @@ class ServerCog(commands.Cog):
         if channel_id and template:
             channel = member.guild.get_channel(channel_id)
             if channel is not None:
-                await channel.send(self.format_message(template, member))
+                await self.send_member_embed(
+                    channel,
+                    title="Goodbye",
+                    description=self.format_message(template, member),
+                    reaction="sad",
+                    member=member,
+                )
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild: discord.Guild):
