@@ -56,6 +56,23 @@ MODERATION_CATEGORY = CategoryInfo(
     ),
 )
 
+SERVER_CATEGORY = CategoryInfo(
+    name="Server",
+    label="Server",
+    summary="Welcome, goodbye, autorole, and message log setup.",
+    commands=(
+        CommandInfo("setwelcome", "setwelcome #channel <message>", "Configure a custom welcome message."),
+        CommandInfo("clearwelcome", "clearwelcome", "Disable welcome messages."),
+        CommandInfo("setgoodbye", "setgoodbye #channel <message>", "Configure a custom goodbye message."),
+        CommandInfo("cleargoodbye", "cleargoodbye", "Disable goodbye messages."),
+        CommandInfo("setautorole", "setautorole @role", "Automatically grant a role to new members."),
+        CommandInfo("clearautorole", "clearautorole", "Disable the auto role feature."),
+        CommandInfo("setlogchannel", "setlogchannel #channel", "Log edited and deleted messages."),
+        CommandInfo("clearlogchannel", "clearlogchannel", "Disable edit/delete logging."),
+        CommandInfo("serversettings", "serversettings", "Show the current server settings."),
+    ),
+)
+
 MANAGEMENT_CATEGORY = CategoryInfo(
     name="Management",
     label="Management",
@@ -70,7 +87,7 @@ MANAGEMENT_CATEGORY = CategoryInfo(
 
 
 def get_categories(include_management: bool) -> tuple[CategoryInfo, ...]:
-    categories = [GENERAL_CATEGORY, ROLEPLAY_CATEGORY, MODERATION_CATEGORY]
+    categories = [GENERAL_CATEGORY, ROLEPLAY_CATEGORY, MODERATION_CATEGORY, SERVER_CATEGORY]
     if include_management:
         categories.append(MANAGEMENT_CATEGORY)
     return tuple(categories)

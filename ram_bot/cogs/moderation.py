@@ -21,6 +21,8 @@ class ModerationCog(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(kick_members=True)
+    @commands.guild_only()
+    @commands.cooldown(1, 5, commands.BucketType.guild)
     async def kick(self, ctx, member: discord.Member, *, reason: str = "No reason provided"):
         if member == ctx.author:
             await ctx.send("You cannot kick yourself.")
@@ -38,6 +40,8 @@ class ModerationCog(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(ban_members=True)
+    @commands.guild_only()
+    @commands.cooldown(1, 5, commands.BucketType.guild)
     async def ban(self, ctx, member: discord.Member, *, reason: str = "No reason provided"):
         if member == ctx.author:
             await ctx.send("You cannot ban yourself.")
@@ -55,6 +59,8 @@ class ModerationCog(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(ban_members=True)
+    @commands.guild_only()
+    @commands.cooldown(1, 5, commands.BucketType.guild)
     async def unban(self, ctx, *, user: str = ""):
         if "#" not in user:
             await ctx.send("Use the format `name#1234` for the user you want to unban.")
@@ -74,6 +80,8 @@ class ModerationCog(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(manage_messages=True)
+    @commands.guild_only()
+    @commands.cooldown(1, 5, commands.BucketType.guild)
     async def purge(self, ctx, amount: int):
         if amount < 1:
             await ctx.send("Please choose a number greater than 0.")

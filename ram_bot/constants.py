@@ -86,3 +86,24 @@ ROLEPLAY_GIFS = {
 }
 
 EMBED_COLOR = (248, 186, 203)
+
+STATUS_MESSAGES = (
+    "Ram finds this server... tolerable.",
+    "Try not to be useless, okay?",
+    "Ram is watching. Disappointed.",
+    "If you need help, don't ask Barusu.",
+    "Ram expected better.",
+    "Ram is not impressed.",
+    "Keep talking. Ram is judging you.",
+    "Pathetic... but entertaining.",
+    "Cleaning up your mess. Again.",
+    "A maid's job includes dealing with you.",
+    "Maintaining order despite everything.",
+    "Ram keeps things running. Somehow.",
+    "Even a maid has limits.",
+    "Serving... with disappointment.",
+    "Efficiency over kindness.",
+    "Ram does the work others can't.",
+    "This server requires constant maintenance.",
+    "Try not to make more work for Ram.",
+)

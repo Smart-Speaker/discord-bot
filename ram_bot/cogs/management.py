@@ -10,6 +10,7 @@ class ManagementCog(commands.Cog):
 
     @commands.command()
     @owner_only()
+    @commands.cooldown(1, 3, commands.BucketType.user)
     async def status(self, ctx):
         embed = discord.Embed(
             title="Owner Status Panel",
@@ -36,17 +37,20 @@ class ManagementCog(commands.Cog):
 
     @commands.command()
     @owner_only()
+    @commands.cooldown(1, 3, commands.BucketType.user)
     async def whoami(self, ctx):
         await ctx.send(f"Your user ID is: {ctx.author.id}")
 
     @commands.command()
     @owner_only()
+    @commands.cooldown(1, 10, commands.BucketType.user)
     async def restartbot(self, ctx):
         await ctx.send("Restarting the bot process. Your Docker container needs a restart policy enabled for it to come back automatically.")
         raise SystemExit(0)
 
     @commands.command()
     @owner_only()
+    @commands.cooldown(1, 10, commands.BucketType.user)
     async def shutdownbot(self, ctx):
         await ctx.send("Shutting down the bot process now.")
         await self.bot.close()

@@ -54,6 +54,42 @@ def build_help_embed(prefix: str, include_management: bool) -> discord.Embed:
     return embed
 
 
+def build_help_pages(prefix: str, include_management: bool) -> list[discord.Embed]:
+    categories = list(get_categories(include_management))
+    pages: list[discord.Embed] = []
+
+    overview = discord.Embed(
+        title="Help Menu - Ram's Guide For Beginners",
+        description=(
+            "Browse the pages below for commands and setup options.\n"
+            f"Use `{prefix}help <command>` for direct help."
+        ),
+        color=brand_color(),
+    )
+    overview.add_field(name="Prefix", value=f"`{prefix}`", inline=False)
+    for index, category in enumerate(categories, start=1):
+        command_list = ", ".join(f"`{command.name}`" for command in category.commands[:4])
+        if len(category.commands) > 4:
+            command_list += ", ..."
+        overview.add_field(
+            name=category.label,
+            value=f"{category.summary}\n{command_list}",
+            inline=True,
+        )
+        if index % 2 == 0:
+            overview.add_field(name=SPACER, value=SPACER, inline=False)
+    overview.set_image(url=HELP_GIF_URL)
+    overview.set_footer(text="Page 1")
+    pages.append(overview)
+
+    for page_number, category in enumerate(categories, start=2):
+        page = build_category_help_embed(prefix, category)
+        page.set_footer(text=f"Page {page_number}")
+        pages.append(page)
+
+    return pages
+
+
 def build_command_help_embed(prefix: str, command: CommandInfo) -> discord.Embed:
     embed = discord.Embed(
         title=f"Command Help - {command.name}",

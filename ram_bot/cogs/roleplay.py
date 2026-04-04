@@ -51,6 +51,7 @@ class RoleplayCog(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
     async def hug(self, ctx, member: discord.Member | None = None):
         await self.send_target_action(
             ctx,
@@ -63,6 +64,7 @@ class RoleplayCog(commands.Cog):
         )
 
     @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
     async def kiss(self, ctx, member: discord.Member | None = None):
         await self.send_target_action(
             ctx,
@@ -75,6 +77,7 @@ class RoleplayCog(commands.Cog):
         )
 
     @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
     async def laugh(self, ctx):
         await self.send_self_action(
             ctx,
@@ -84,6 +87,7 @@ class RoleplayCog(commands.Cog):
         )
 
     @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
     async def pat(self, ctx, member: discord.Member | None = None):
         await self.send_target_action(
             ctx,
@@ -96,6 +100,7 @@ class RoleplayCog(commands.Cog):
         )
 
     @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
     async def cuddle(self, ctx, member: discord.Member | None = None):
         await self.send_target_action(
             ctx,
@@ -108,6 +113,7 @@ class RoleplayCog(commands.Cog):
         )
 
     @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
     async def wave(self, ctx, member: discord.Member | None = None):
         await self.send_target_action(
             ctx,
@@ -120,6 +126,7 @@ class RoleplayCog(commands.Cog):
         )
 
     @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
     async def blush(self, ctx):
         await self.send_self_action(
             ctx,
@@ -129,6 +136,7 @@ class RoleplayCog(commands.Cog):
         )
 
     @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
     async def glare(self, ctx, member: discord.Member | None = None):
         await self.send_target_action(
             ctx,
@@ -141,6 +149,7 @@ class RoleplayCog(commands.Cog):
         )
 
     @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
     async def cry(self, ctx):
         await self.send_self_action(
             ctx,
@@ -150,6 +159,7 @@ class RoleplayCog(commands.Cog):
         )
 
     @commands.command(hidden=True)
+    @commands.cooldown(1, 4, commands.BucketType.user)
     async def bite(self, ctx, member: discord.Member | None = None):
         await self.send_target_action(
             ctx,
@@ -162,6 +172,7 @@ class RoleplayCog(commands.Cog):
         )
 
     @commands.command(hidden=True)
+    @commands.cooldown(1, 4, commands.BucketType.user)
     async def smug(self, ctx):
         await self.send_self_action(
             ctx,
@@ -171,6 +182,7 @@ class RoleplayCog(commands.Cog):
         )
 
     @commands.command(hidden=True)
+    @commands.cooldown(1, 4, commands.BucketType.user)
     async def pout(self, ctx):
         await self.send_self_action(
             ctx,
