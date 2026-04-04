@@ -8,6 +8,7 @@ class BotConfig:
     prefix: str
     owner_id: int | None
     data_dir: str
+    ai_enabled: bool
     ollama_url: str
     ollama_model: str
 
@@ -17,6 +18,7 @@ class BotConfig:
         prefix = os.getenv("BOT_PREFIX", "!")
         owner_id_raw = os.getenv("OWNER_ID")
         data_dir = os.getenv("BOT_DATA_DIR", "/appdata")
+        ai_enabled = os.getenv("AI_ENABLED", "false").lower() == "true"
         ollama_url = os.getenv("OLLAMA_URL", "http://192.168.0.240:11434/api/generate")
         ollama_model = os.getenv("OLLAMA_MODEL", "ram")
 
@@ -29,6 +31,7 @@ class BotConfig:
                 prefix=prefix,
                 owner_id=None,
                 data_dir=data_dir,
+                ai_enabled=ai_enabled,
                 ollama_url=ollama_url,
                 ollama_model=ollama_model,
             )
@@ -43,6 +46,7 @@ class BotConfig:
             prefix=prefix,
             owner_id=owner_id,
             data_dir=data_dir,
+            ai_enabled=ai_enabled,
             ollama_url=ollama_url,
             ollama_model=ollama_model,
         )

@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 
 from ram_bot.checks import owner_only
+from ram_bot.ollama import test_ollama_connection
 
 
 class ManagementCog(commands.Cog):
@@ -40,6 +41,26 @@ class ManagementCog(commands.Cog):
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def whoami(self, ctx):
         await ctx.send(f"Your user ID is: {ctx.author.id}")
+
+    @commands.command()
+    @owner_only()
+    @commands.cooldown(1, 10, commands.BucketType.user)
+    async def ollamatest(self, ctx):
+        async with ctx.typing():
+            reply = await test_ollama_connection(
+                self.bot.config.ollama_url,
+                self.bot.config.ollama_model,
+            )
+
+        embed = discord.Embed(
+            title="Ollama Connectivity Test",
+            color=discord.Color.green(),
+        )
+        embed.add_field(name="Endpoint", value=f"`{self.bot.config.ollama_url}`", inline=False)
+        embed.add_field(name="Model", value=f"`{self.bot.config.ollama_model}`", inline=True)
+        embed.add_field(name="Status", value="`reachable`", inline=True)
+        embed.add_field(name="Sample Reply", value=reply[:1024], inline=False)
+        await ctx.send(embed=embed)
 
     @commands.command()
     @owner_only()

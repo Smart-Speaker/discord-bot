@@ -1,4 +1,5 @@
 HELP_GIF_URL = "https://c.tenor.com/wklB6YsMfXEAAAAd/ram-re.gif"
+GUILD_JOIN_GIF_URL = "https://media.tenor.com/gSGAezNE6SoAAAAC/re-zero-ram.gif"
 OTAKU_GIFS_API_URL = "https://api.otakugifs.xyz/gif?reaction={reaction}"
 
 ROLEPLAY_REACTIONS = {
@@ -151,3 +152,87 @@ SELF_REMOVAL_MESSAGES = (
     "If you're trying to escape, you're doing a terrible job of it.",
     "Attempt failed. Try being useful instead.",
 )
+
+RAM_FALLBACK_REPLIES = (
+    "Hmph. Ram heard you. Try not to waste the moment.",
+    "If you need something, say it properly.",
+    "Ram is listening. Briefly.",
+    "What now? Make it worth Ram's attention.",
+    "You're talking to Ram. Try not to embarrass yourself.",
+    "How troublesome. Go on, then.",
+    "Ram will respond, since no one else seems capable.",
+    "Speak clearly. Ram is not guessing what you mean.",
+    "If this is pointless, Ram will be annoyed. More than usual.",
+    "Fine. Ram is here. Continue.",
+)
+
+RAM_AI_UNAVAILABLE_REPLIES = (
+    "Ram would answer properly, but that part of the system is failing again. How annoying.",
+    "It seems Ram's deeper thoughts are unavailable at the moment. You'll survive with less.",
+    "That connection failed. Naturally, Ram is the one left to deal with it.",
+    "The backend is being troublesome. Ask again when it learns to behave.",
+    "Ram could say more, if the machine behind the curtain weren't being useless.",
+    "How inconvenient. The AI reply path is unavailable right now.",
+    "That request would have gone through the model, if it were actually cooperating.",
+    "The endpoint failed again. Try later, and try not to make it Ram's problem.",
+)
+
+AFFINITY_REPLIES = {
+    "cold": (
+        "Hmph. Ram noticed. Barely.",
+        "Don't get the wrong idea. Ram is only acknowledging you.",
+    ),
+    "neutral": (
+        "You're becoming slightly less troublesome.",
+        "Ram supposes that was acceptable.",
+    ),
+    "warm": (
+        "Ram may be getting used to your company. Unfortunately.",
+        "You're not entirely insufferable today.",
+    ),
+    "close": (
+        "Ram is starting to expect you around. Try not to ruin that.",
+        "You're familiar now. Don't make Ram regret it.",
+    ),
+}
+
+RARE_ROLEPLAY_REPLIES = (
+    "Ram actually found that mildly cute. Don't expect to hear it twice.",
+    "For a moment, that was almost charming. Almost.",
+    "Ram will admit that one earned a little extra attention.",
+)
+
+ROLEPLAY_COMBOS = {
+    ("hug", "blush"): "Ram noticed that little sequence. You're being unusually bold.",
+    ("blush", "cuddle"): "That escalated quickly. Ram is judging you, quietly.",
+    ("hug", "blush", "cuddle"): "You actually managed a decent chain. Don't let it go to your head.",
+}
+
+DEFAULT_DOMAIN_WHITELIST = (
+    "discord.com",
+    "discord.gg",
+    "github.com",
+    "youtu.be",
+    "youtube.com",
+    "tenor.com",
+    "c.tenor.com",
+    "media.tenor.com",
+    "api.otakugifs.xyz",
+)
+
+BAD_WORDS = {
+    "mild": ("damn", "hell", "idiot", "stupid"),
+    "severe": ("fuck", "bitch", "shit"),
+}
+
+DEFAULT_WARNING_THRESHOLD = 3
+DEFAULT_AUTO_TIMEOUT_MINUTES = 10
+SPAM_MESSAGE_LIMIT = 5
+SPAM_WINDOW_SECONDS = 8
+REPEAT_MESSAGE_LIMIT = 3
+XP_PER_MESSAGE_RANGE = (8, 15)
+DAILY_XP_REWARD = 120
+DAILY_AFFINITY_REWARD = 8
+CHECKIN_AFFINITY_REWARD = 3
+DAILY_HUG_AFFINITY_REWARD = 5
+RARE_RESPONSE_CHANCE = 0.01

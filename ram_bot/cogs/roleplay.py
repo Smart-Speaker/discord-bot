@@ -1,6 +1,9 @@
 import discord
+import random
+from datetime import datetime, timezone
 from discord.ext import commands
 
+from ram_bot.constants import AFFINITY_REPLIES, RARE_RESPONSE_CHANCE, RARE_ROLEPLAY_REPLIES, ROLEPLAY_COMBOS
 from ram_bot.embeds import build_action_embed
 from ram_bot.reactions import get_reaction_gif
 
@@ -8,6 +11,46 @@ from ram_bot.reactions import get_reaction_gif
 class RoleplayCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+
+    def get_profile(self, guild_id: int, user_id: int) -> dict:
+        return self.bot.user_profiles.get_profile(f"guild:{guild_id}", user_id)
+
+    def affinity_tier(self, affinity: int) -> str:
+        if affinity >= 150:
+            return "close"
+        if affinity >= 75:
+            return "warm"
+        if affinity >= 25:
+            return "neutral"
+        return "cold"
+
+    async def post_roleplay_bonus(self, ctx, action_name: str):
+        if ctx.guild is None:
+            return
+        profile = self.get_profile(ctx.guild.id, ctx.author.id)
+        now = datetime.now(timezone.utc)
+        previous_action = profile.get("last_roleplay_action")
+        previous_at_raw = profile.get("last_roleplay_at")
+        if previous_at_raw:
+            previous_at = datetime.fromisoformat(previous_at_raw)
+            if (now - previous_at).total_seconds() > 600:
+                previous_action = None
+        sequence = [entry for entry in (previous_action, action_name) if entry]
+        combo_reply = ROLEPLAY_COMBOS.get(tuple(sequence))
+        if previous_action == "hug" and action_name == "cuddle":
+            combo_reply = ROLEPLAY_COMBOS.get(("hug", "blush", "cuddle"), combo_reply)
+
+        profile["affinity"] += 1
+        profile["last_roleplay_action"] = action_name
+        profile["last_roleplay_at"] = now.isoformat()
+        self.bot.user_profiles.save_profile(f"guild:{ctx.guild.id}", ctx.author.id, profile)
+
+        if combo_reply:
+            await ctx.send(combo_reply)
+        elif random.random() < RARE_RESPONSE_CHANCE:
+            await ctx.send(random.choice(RARE_ROLEPLAY_REPLIES))
+        elif action_name in {"hug", "cuddle", "blush"}:
+            await ctx.send(random.choice(AFFINITY_REPLIES[self.affinity_tier(profile["affinity"])]))
 
     async def send_self_action(self, ctx, action_name: str, title: str, description: str):
         gif_url = await get_reaction_gif(action_name)
@@ -18,6 +61,7 @@ class RoleplayCog(commands.Cog):
             gif_url=gif_url,
         )
         await ctx.send(embed=embed)
+        await self.post_roleplay_bonus(ctx, action_name)
 
     async def send_target_action(
         self,
@@ -49,6 +93,7 @@ class RoleplayCog(commands.Cog):
             gif_url=gif_url,
         )
         await ctx.send(embed=embed)
+        await self.post_roleplay_bonus(ctx, action_name)
 
     @commands.command()
     @commands.cooldown(1, 4, commands.BucketType.user)

@@ -1,10 +1,11 @@
 import discord
 from discord.ext import commands, tasks
 from itertools import cycle
+from datetime import datetime, timezone
 
 from ram_bot.config import BotConfig
 from ram_bot.constants import STATUS_MESSAGES
-from ram_bot.storage import GuildSettingsStore
+from ram_bot.storage import GuildSettingsStore, ReminderStore, UserProfileStore
 
 
 class RamBot(commands.Bot):
@@ -20,6 +21,10 @@ class RamBot(commands.Bot):
         )
         self.config = config
         self.settings = GuildSettingsStore(config.data_dir)
+        self.user_profiles = UserProfileStore(config.data_dir)
+        self.reminders = ReminderStore(config.data_dir)
+        self.started_at = datetime.now(timezone.utc)
+        self.automod_cache = {}
         self.status_messages = cycle(STATUS_MESSAGES)
         self.initial_extensions = (
             "ram_bot.cogs.general",
@@ -28,6 +33,9 @@ class RamBot(commands.Bot):
             "ram_bot.cogs.management",
             "ram_bot.cogs.server",
             "ram_bot.cogs.audit",
+            "ram_bot.cogs.automod",
+            "ram_bot.cogs.progression",
+            "ram_bot.cogs.utility",
         )
 
     def is_owner(self, user_id: int) -> bool:

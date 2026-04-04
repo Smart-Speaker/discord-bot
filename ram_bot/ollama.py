@@ -64,3 +64,7 @@ def _generate(url: str, model: str, prompt: str) -> str:
 
 async def generate_ram_reply(url: str, model: str, prompt: str) -> str:
     return await asyncio.to_thread(_generate, url, model, prompt)
+
+
+async def test_ollama_connection(url: str, model: str) -> str:
+    return await generate_ram_reply(url, model, "hello")

@@ -47,19 +47,22 @@ ROLEPLAY_CATEGORY = CategoryInfo(
 MODERATION_CATEGORY = CategoryInfo(
     name="Moderation",
     label="Moderation",
-    summary="Server moderation and cleanup tools.",
+    summary="Server moderation, warnings, timeouts, and automod tools.",
     commands=(
         CommandInfo("kick", "kick @user [reason]", "Kick a member from the server."),
         CommandInfo("ban", "ban @user [reason]", "Ban a member from the server."),
         CommandInfo("unban", "unban name#1234", "Unban a previously banned user."),
         CommandInfo("purge", "purge <amount>", "Delete a number of recent messages."),
+        CommandInfo("warn", "warn @user [reason]", "Warn a member and track it in Ram's records."),
+        CommandInfo("warnings", "warnings @user", "Show a member's stored warnings."),
+        CommandInfo("timeout", "timeout @user <time> [reason]", "Apply a Discord timeout to a member."),
     ),
 )
 
 SERVER_CATEGORY = CategoryInfo(
     name="Server",
     label="Server",
-    summary="Welcome, goodbye, autorole, and message log setup.",
+    summary="Welcome, goodbye, autorole, logs, and automod setup.",
     commands=(
         CommandInfo("setwelcome", "setwelcome #channel <message>", "Set the channel and message used when someone joins. Supports {user}, {username}, {server}, and {count}."),
         CommandInfo("clearwelcome", "clearwelcome", "Turn off welcome messages for the server."),
@@ -69,7 +72,41 @@ SERVER_CATEGORY = CategoryInfo(
         CommandInfo("clearautorole", "clearautorole", "Disable automatic role assignment."),
         CommandInfo("setlogchannel", "setlogchannel #channel", "Send edited and deleted message logs to a specific channel."),
         CommandInfo("clearlogchannel", "clearlogchannel", "Turn off edited/deleted message logging."),
+        CommandInfo("whitelistdomain", "whitelistdomain <domain>", "Allow a domain through the automod link filter."),
+        CommandInfo("unwhitelistdomain", "unwhitelistdomain <domain>", "Remove a domain from the automod whitelist."),
+        CommandInfo("whitelistdomains", "whitelistdomains", "Show the current domain whitelist."),
+        CommandInfo("setwarningthreshold", "setwarningthreshold <count>", "Set how many warnings trigger an automatic timeout."),
+        CommandInfo("setautotimeout", "setautotimeout <minutes>", "Set the timeout length used after too many warnings."),
         CommandInfo("serversettings", "serversettings", "Show the current welcome, goodbye, autorole, and log settings."),
+    ),
+)
+
+PROGRESSION_CATEGORY = CategoryInfo(
+    name="Progression",
+    label="Progression",
+    summary="XP, affinity, leveling, daily rewards, and rankings.",
+    commands=(
+        CommandInfo("rank", "rank [@user]", "Show a user's XP, level, and affinity with Ram."),
+        CommandInfo("leaderboard", "leaderboard", "Show the top users by XP in this server."),
+        CommandInfo("daily", "daily", "Claim a daily XP and affinity reward."),
+        CommandInfo("checkin", "checkin", "Check in with Ram for a small affinity boost."),
+        CommandInfo("dailyhug", "dailyhug", "Get a daily affectionate interaction from Ram."),
+        CommandInfo("setlevelrole", "setlevelrole <level> @role", "Give a role automatically at a specific level."),
+        CommandInfo("clearlevelrole", "clearlevelrole <level>", "Remove a configured level reward role."),
+    ),
+)
+
+UTILITY_CATEGORY = CategoryInfo(
+    name="Utility",
+    label="Utility",
+    summary="Everyday information, reminders, and polls.",
+    commands=(
+        CommandInfo("avatar", "avatar [@user]", "Show someone's avatar."),
+        CommandInfo("userinfo", "userinfo [@user]", "Show details about a user."),
+        CommandInfo("serverinfo", "serverinfo", "Show details about the server."),
+        CommandInfo("uptime", "uptime", "Show how long the bot has been running."),
+        CommandInfo("remind", "remind <time> <message>", "Set a reminder in the current channel."),
+        CommandInfo("poll", "poll <question | option 1 | option 2 ...>", "Create a quick reaction poll."),
     ),
 )
 
@@ -80,6 +117,7 @@ MANAGEMENT_CATEGORY = CategoryInfo(
     commands=(
         CommandInfo("status", "status", "Show bot and hosting status."),
         CommandInfo("whoami", "whoami", "Show your Discord user ID."),
+        CommandInfo("ollamatest", "ollamatest", "Test whether the bot container can reach the Ollama backend."),
         CommandInfo("restartbot", "restartbot", "Exit the bot so Docker can restart it."),
         CommandInfo("shutdownbot", "shutdownbot", "Stop the bot process."),
     ),
@@ -87,7 +125,14 @@ MANAGEMENT_CATEGORY = CategoryInfo(
 
 
 def get_categories(include_management: bool) -> tuple[CategoryInfo, ...]:
-    categories = [GENERAL_CATEGORY, ROLEPLAY_CATEGORY, MODERATION_CATEGORY, SERVER_CATEGORY]
+    categories = [
+        GENERAL_CATEGORY,
+        ROLEPLAY_CATEGORY,
+        MODERATION_CATEGORY,
+        SERVER_CATEGORY,
+        PROGRESSION_CATEGORY,
+        UTILITY_CATEGORY,
+    ]
     if include_management:
         categories.append(MANAGEMENT_CATEGORY)
     return tuple(categories)

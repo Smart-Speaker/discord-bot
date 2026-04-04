@@ -1,9 +1,11 @@
 import discord
+import random
 from discord.ext import commands
 
 from ram_bot.catalog import find_category, find_command
+from ram_bot.constants import RAM_AI_UNAVAILABLE_REPLIES, RAM_FALLBACK_REPLIES
 from ram_bot.embeds import (
-    build_category_help_embed,
+    build_category_help_pages,
     build_command_help_embed,
     build_help_pages,
 )
@@ -46,14 +48,20 @@ class GeneralCog(commands.Cog):
         self.bot = bot
 
     async def send_ram_reply(self, message: discord.Message, content: str):
-        prompt = build_ram_prompt(message, content)
+        if self.bot.config.ai_enabled:
+            try:
+                prompt = build_ram_prompt(message, content)
 
-        async with message.channel.typing():
-            reply = await generate_ram_reply(
-                self.bot.config.ollama_url,
-                self.bot.config.ollama_model,
-                prompt,
-            )
+                async with message.channel.typing():
+                    reply = await generate_ram_reply(
+                        self.bot.config.ollama_url,
+                        self.bot.config.ollama_model,
+                        prompt,
+                    )
+            except RuntimeError:
+                reply = random.choice(RAM_AI_UNAVAILABLE_REPLIES)
+        else:
+            reply = random.choice(RAM_FALLBACK_REPLIES)
 
         await message.reply(reply[:2000], mention_author=True)
 
@@ -79,12 +87,14 @@ class GeneralCog(commands.Cog):
 
         category = find_category(query, include_management)
         if category is not None:
-            await ctx.send(
-                embed=build_category_help_embed(
-                    prefix=self.bot.command_prefix,
-                    category=category,
-                )
+            pages = build_category_help_pages(
+                prefix=self.bot.command_prefix,
+                category=category,
             )
+            if len(pages) == 1:
+                await ctx.send(embed=pages[0])
+            else:
+                await ctx.send(embed=pages[0], view=HelpPaginator(ctx.author.id, pages))
             return
 
         await ctx.send("I could not find that command or category.")

@@ -1,10 +1,23 @@
 import discord
 from discord.ext import commands
 
+from ram_bot.constants import DEFAULT_AUTO_TIMEOUT_MINUTES, DEFAULT_DOMAIN_WHITELIST, DEFAULT_WARNING_THRESHOLD, GUILD_JOIN_GIF_URL
+
 
 class ServerCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+
+    def find_join_channel(self, guild: discord.Guild) -> discord.abc.Messageable | None:
+        if guild.system_channel and guild.system_channel.permissions_for(guild.me).send_messages:
+            return guild.system_channel
+
+        for channel in guild.text_channels:
+            permissions = channel.permissions_for(guild.me)
+            if permissions.send_messages and permissions.embed_links:
+                return channel
+
+        return None
 
     def get_settings(self, guild_id: int) -> dict:
         return self.bot.settings.get_guild(guild_id)
@@ -135,6 +148,32 @@ class ServerCog(commands.Cog):
             value=f"<#{settings['log_channel_id']}>" if settings.get("log_channel_id") else "Disabled",
             inline=True,
         )
+        embed.add_field(
+            name="Warning Threshold",
+            value=str(settings.get("warning_threshold", DEFAULT_WARNING_THRESHOLD)),
+            inline=True,
+        )
+        embed.add_field(
+            name="Auto Timeout",
+            value=f"{settings.get('auto_timeout_minutes', DEFAULT_AUTO_TIMEOUT_MINUTES)} minutes",
+            inline=True,
+        )
+        domains = settings.get("domain_whitelist", list(DEFAULT_DOMAIN_WHITELIST))
+        embed.add_field(
+            name="Whitelisted Domains",
+            value=", ".join(f"`{domain}`" for domain in domains[:8]) + (" ..." if len(domains) > 8 else ""),
+            inline=False,
+        )
+        level_roles = settings.get("level_roles", {})
+        embed.add_field(
+            name="Level Roles",
+            value=(
+                "\n".join(f"Level {level}: <@&{role_id}>" for level, role_id in sorted(level_roles.items(), key=lambda item: int(item[0])))
+                if level_roles
+                else "None configured"
+            ),
+            inline=False,
+        )
         await ctx.send(embed=embed)
 
     @commands.Cog.listener()
@@ -166,6 +205,23 @@ class ServerCog(commands.Cog):
             channel = member.guild.get_channel(channel_id)
             if channel is not None:
                 await channel.send(self.format_message(template, member))
+
+    @commands.Cog.listener()
+    async def on_guild_join(self, guild: discord.Guild):
+        channel = self.find_join_channel(guild)
+        if channel is None:
+            return
+
+        embed = discord.Embed(
+            title="Ram has arrived",
+            description=(
+                "Hmph. Ram is here now.\n"
+                "Use `!help` if you need the command list. Try not to waste Ram's time."
+            ),
+            color=discord.Color.from_rgb(248, 186, 203),
+        )
+        embed.set_image(url=GUILD_JOIN_GIF_URL)
+        await channel.send(embed=embed)
 
 
 async def setup(bot):
