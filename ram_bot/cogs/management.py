@@ -18,7 +18,12 @@ class ManagementCog(commands.Cog):
         embed.add_field(name="Prefix", value=f"`{self.bot.command_prefix}`")
         embed.add_field(name="Latency", value=f"`{round(self.bot.latency * 1000)}ms`")
         embed.add_field(name="Guilds", value=str(len(self.bot.guilds)))
-        embed.add_field(name="Owner ID", value=f"`{self.bot.config.owner_id}`", inline=False)
+        owner_value = (
+            f"`{self.bot.config.owner_id}`"
+            if self.bot.config.owner_id is not None
+            else "`Not configured`"
+        )
+        embed.add_field(name="Owner ID", value=owner_value, inline=False)
         embed.add_field(
             name="Bot Controls",
             value=(

@@ -23,7 +23,7 @@ class RamBot(commands.Bot):
         )
 
     def is_owner(self, user_id: int) -> bool:
-        return user_id == self.config.owner_id
+        return self.config.owner_id is not None and user_id == self.config.owner_id
 
     async def setup_hook(self):
         for extension in self.initial_extensions:

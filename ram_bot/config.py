@@ -6,7 +6,7 @@ import os
 class BotConfig:
     token: str
     prefix: str
-    owner_id: int
+    owner_id: int | None
 
     @classmethod
     def from_env(cls) -> "BotConfig":
@@ -18,7 +18,7 @@ class BotConfig:
             raise ValueError("DISCORD_TOKEN is not set")
 
         if not owner_id_raw:
-            raise ValueError("OWNER_ID is not set")
+            return cls(token=token, prefix=prefix, owner_id=None)
 
         try:
             owner_id = int(owner_id_raw)
