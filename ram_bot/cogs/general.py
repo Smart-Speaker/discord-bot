@@ -7,6 +7,7 @@ from ram_bot.embeds import (
     build_command_help_embed,
     build_help_pages,
 )
+from ram_bot.ollama import build_ram_prompt, generate_ram_reply
 
 
 class HelpPaginator(discord.ui.View):
@@ -43,6 +44,18 @@ class HelpPaginator(discord.ui.View):
 class GeneralCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+
+    async def send_ram_reply(self, message: discord.Message, content: str):
+        prompt = build_ram_prompt(message, content)
+
+        async with message.channel.typing():
+            reply = await generate_ram_reply(
+                self.bot.config.ollama_url,
+                self.bot.config.ollama_model,
+                prompt,
+            )
+
+        await message.reply(reply[:2000], mention_author=True)
 
     @commands.command(name="help")
     @commands.cooldown(1, 3, commands.BucketType.user)
@@ -85,6 +98,41 @@ class GeneralCog(commands.Cog):
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def hello(self, ctx):
         await ctx.reply(f"Hi there! {ctx.author.display_name} :grin:", mention_author=True)
+
+    @commands.command()
+    @commands.cooldown(1, 8, commands.BucketType.user)
+    async def ram(self, ctx, *, message: str):
+        await self.send_ram_reply(ctx.message, message)
+
+    @commands.Cog.listener()
+    async def on_message(self, message: discord.Message):
+        if message.author.bot or self.bot.user is None:
+            return
+
+        prefix = self.bot.command_prefix
+        if isinstance(prefix, str) and message.content.startswith(prefix):
+            return
+
+        mention_forms = (
+            f"<@{self.bot.user.id}>",
+            f"<@!{self.bot.user.id}>",
+        )
+
+        content = message.content.strip()
+        matched_mention = next((mention for mention in mention_forms if content.startswith(mention)), None)
+        if matched_mention is None:
+            return
+
+        payload = content[len(matched_mention):].strip()
+        if not payload:
+            await message.reply("Hmph. If you're going to summon Ram, at least say something useful.", mention_author=True)
+            return
+
+        ctx = await self.bot.get_context(message)
+        if ctx.valid:
+            return
+
+        await self.send_ram_reply(message, payload)
 
 
 async def setup(bot):
