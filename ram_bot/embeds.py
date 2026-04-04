@@ -10,6 +10,15 @@ def brand_color() -> discord.Color:
     return discord.Color.from_rgb(*EMBED_COLOR)
 
 
+def format_command_rows(commands: tuple[CommandInfo, ...], per_row: int = 3, limit: int | None = None) -> str:
+    entries = [f"`{command.name}`" for command in commands[:limit]]
+    rows = [
+        ", ".join(entries[index:index + per_row])
+        for index in range(0, len(entries), per_row)
+    ]
+    return "\n".join(rows)
+
+
 def build_help_embed(prefix: str, include_management: bool) -> discord.Embed:
     categories = list(get_categories(include_management))
 
@@ -24,7 +33,7 @@ def build_help_embed(prefix: str, include_management: bool) -> discord.Embed:
     embed.add_field(name="Prefix", value=f"`{prefix}`", inline=False)
 
     for index, category in enumerate(categories, start=1):
-        command_list = ", ".join(f"`{command.name}`" for command in category.commands)
+        command_list = format_command_rows(category.commands, per_row=3)
         embed.add_field(
             name=category.label,
             value=f"{category.summary}\n{command_list}",
@@ -68,9 +77,9 @@ def build_help_pages(prefix: str, include_management: bool) -> list[discord.Embe
     )
     overview.add_field(name="Prefix", value=f"`{prefix}`", inline=False)
     for index, category in enumerate(categories, start=1):
-        command_list = ", ".join(f"`{command.name}`" for command in category.commands[:4])
+        command_list = format_command_rows(category.commands, per_row=2, limit=6)
         if len(category.commands) > 4:
-            command_list += ", ..."
+            command_list += "\n`...`"
         overview.add_field(
             name=category.label,
             value=f"{category.summary}\n{command_list}",
@@ -111,6 +120,17 @@ def build_category_help_embed(prefix: str, category: CategoryInfo) -> discord.Em
         embed.add_field(
             name=f"{prefix}{command.name}",
             value=f"{command.description}\nUsage: `{prefix}{command.usage}`",
+            inline=False,
+        )
+    if category.name == "Server":
+        embed.add_field(
+            name="Examples",
+            value=(
+                f"`{prefix}setwelcome #general Welcome {{user}} to {{server}}!`\n"
+                f"`{prefix}setgoodbye #general Goodbye {{username}}.`\n"
+                f"`{prefix}setautorole @Members`\n"
+                f"`{prefix}setlogchannel #logs`"
+            ),
             inline=False,
         )
     embed.set_footer(text=f"Use {prefix}help <command> for individual command help.")
