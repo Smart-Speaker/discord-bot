@@ -14,13 +14,16 @@ GELBOORU_STARTER_TAGS = (
     "neko",
     "maid",
     "ram_(re:zero)",
+    "rem_(re:zero)",
 )
 
 GELBOORU_NSFW_PRESETS = {
     "pussy": "pussy",
     "tits": "boobs,oppai",
     "ass": "ass",
-    "maid": "maid,~ram_(re:zero),~rem_(re:zero)",
+    "maid": "maid",
+    "ram": "ram_(re:zero),maid",
+    "rem": "rem_(re:zero),maid",
     "anal": "anal",
     "thighs": "thigh,legs",
     "blowjob": "fellatio",

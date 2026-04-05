@@ -355,6 +355,16 @@ NSFW_COMMAND_LINES = {
         "You really were waiting for the maid version of Ram, weren't you?",
         "Even dressed properly, Ram can still be your undoing.",
     ),
+    "ram": (
+        "So you wanted Ram specifically. At least you're being honest about it.",
+        "A request centered on Ram herself? Hmph. Predictable, but acceptable.",
+        "Ram noticed you didn't want just any maid. You wanted her.",
+    ),
+    "rem": (
+        "So your attention drifted toward Rem this time. Ram noticed.",
+        "You've chosen Rem specifically. Ram will remember that.",
+        "A Rem-focused request? Hmph. At least your taste is consistent.",
+    ),
     "anal": (
         "You chose something bolder than usual. Ram noticed the change in tone.",
         "Hmph. Straight to the more demanding requests today.",

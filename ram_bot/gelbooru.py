@@ -26,6 +26,21 @@ def build_gelbooru_tags(include_csv: str, exclude_csv: str, query: str) -> str:
     return "+".join(all_tags)
 
 
+def normalize_image_url(url: str | None) -> str | None:
+    if not url:
+        return None
+    cleaned = str(url).strip()
+    if not cleaned:
+        return None
+    if cleaned.startswith("//"):
+        return f"https:{cleaned}"
+    if cleaned.startswith("/"):
+        return f"https://gelbooru.com{cleaned}"
+    if cleaned.startswith("http://"):
+        return "https://" + cleaned[len("http://"):]
+    return cleaned
+
+
 def _fetch_post(tags: str, auth_suffix: str) -> dict | None:
     request_url = f"{GELBOORU_API_URL}&tags={quote(tags, safe=':+-_()')}{auth_suffix}"
 
@@ -42,7 +57,15 @@ def _fetch_post(tags: str, auth_suffix: str) -> dict | None:
         return None
 
     for post in posts:
-        if isinstance(post, dict) and post.get("file_url"):
+        if not isinstance(post, dict):
+            continue
+        image_url = (
+            normalize_image_url(post.get("sample_url"))
+            or normalize_image_url(post.get("file_url"))
+            or normalize_image_url(post.get("preview_url"))
+        )
+        if image_url:
+            post["image_url"] = image_url
             return post
     return None
 

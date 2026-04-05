@@ -68,7 +68,7 @@ class RoleplayCog(commands.Cog):
             color=discord.Color.from_rgb(248, 186, 203),
             timestamp=ctx.message.created_at,
         )
-        embed.set_image(url=post["file_url"])
+        embed.set_image(url=post["image_url"])
         embed.set_footer(text=f"Relationship: {relationship}")
         await ctx.send(embed=embed)
 
@@ -103,6 +103,16 @@ class RoleplayCog(commands.Cog):
     @commands.cooldown(1, 4, commands.BucketType.user)
     async def maid(self, ctx):
         await self.send_nsfw_preset(ctx, "maid")
+
+    @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def ram(self, ctx):
+        await self.send_nsfw_preset(ctx, "ram")
+
+    @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def rem(self, ctx):
+        await self.send_nsfw_preset(ctx, "rem")
 
     @commands.command()
     @commands.cooldown(1, 4, commands.BucketType.user)
