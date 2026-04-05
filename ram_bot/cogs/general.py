@@ -106,16 +106,6 @@ class GeneralCog(commands.Cog):
                 await ctx.send(embed=pages[0], view=HelpPaginator(ctx.author.id, pages))
             return
 
-        command = find_command(query, include_management, include_admin_tools, in_guild, in_nsfw_context)
-        if command is not None:
-            await ctx.send(
-                embed=build_command_help_embed(
-                    prefix=self.bot.command_prefix,
-                    command=command,
-                )
-            )
-            return
-
         category = find_category(query, include_management, include_admin_tools, in_guild, in_nsfw_context)
         if category is not None:
             pages = build_category_help_pages(
@@ -126,6 +116,16 @@ class GeneralCog(commands.Cog):
                 await ctx.send(embed=pages[0])
             else:
                 await ctx.send(embed=pages[0], view=HelpPaginator(ctx.author.id, pages))
+            return
+
+        command = find_command(query, include_management, include_admin_tools, in_guild, in_nsfw_context)
+        if command is not None:
+            await ctx.send(
+                embed=build_command_help_embed(
+                    prefix=self.bot.command_prefix,
+                    command=command,
+                )
+            )
             return
 
         await ctx.send("I could not find that command or category.")

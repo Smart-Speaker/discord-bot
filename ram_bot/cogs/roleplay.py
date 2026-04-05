@@ -89,8 +89,19 @@ class RoleplayCog(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1, 4, commands.BucketType.user)
-    async def nsfw(self, ctx, *, category: str):
+    async def nsfw(self, ctx, *, category: str | None = None):
+        if not category:
+            await ctx.send(
+                "Give Ram at least one Waifu.im tag to use.\n"
+                "Try `!help nsfw` for the tag guide or `!nsfwcategories` for the quick list."
+            )
+            return
         requested_tags = [part.strip() for part in category.split(",") if part.strip()]
+        if not requested_tags:
+            await ctx.send(
+                "That tag list was empty. Try something like `!nsfw maid` or `!nsfw waifu,uniform`."
+            )
+            return
         label = "NSFW" if self.waifu_nsfw_enabled(ctx) else "SFW"
         await self.send_waifu_embed(ctx, f"{label} - {category.lower()}", requested_tags)
 
