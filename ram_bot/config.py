@@ -11,9 +11,6 @@ class BotConfig:
     ai_enabled: bool
     ollama_url: str
     ollama_model: str
-    gelbooru_auth: str
-    gelbooru_global_include: str
-    gelbooru_global_exclude: str
 
     @classmethod
     def from_env(cls) -> "BotConfig":
@@ -24,9 +21,6 @@ class BotConfig:
         ai_enabled = os.getenv("AI_ENABLED", "false").lower() == "true"
         ollama_url = os.getenv("OLLAMA_URL", "http://192.168.0.240:11434/api/generate")
         ollama_model = os.getenv("OLLAMA_MODEL", "ram")
-        gelbooru_auth = os.getenv("GELBOORU_AUTH", "")
-        gelbooru_global_include = os.getenv("GELBOORU_GLOBAL_INCLUDE", "")
-        gelbooru_global_exclude = os.getenv("GELBOORU_GLOBAL_EXCLUDE", "")
 
         if not token:
             raise ValueError("DISCORD_TOKEN is not set")
@@ -40,9 +34,6 @@ class BotConfig:
                 ai_enabled=ai_enabled,
                 ollama_url=ollama_url,
                 ollama_model=ollama_model,
-                gelbooru_auth=gelbooru_auth,
-                gelbooru_global_include=gelbooru_global_include,
-                gelbooru_global_exclude=gelbooru_global_exclude,
             )
 
         try:
@@ -58,7 +49,4 @@ class BotConfig:
             ai_enabled=ai_enabled,
             ollama_url=ollama_url,
             ollama_model=ollama_model,
-            gelbooru_auth=gelbooru_auth,
-            gelbooru_global_include=gelbooru_global_include,
-            gelbooru_global_exclude=gelbooru_global_exclude,
         )

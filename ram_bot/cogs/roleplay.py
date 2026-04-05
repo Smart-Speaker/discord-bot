@@ -1,13 +1,12 @@
 import discord
-from io import BytesIO
 from datetime import datetime, timezone
 from discord.ext import commands
 
-from ram_bot.constants import GELBOORU_NSFW_PRESETS, GELBOORU_STARTER_TAGS
+from ram_bot.constants import WAIFU_IM_NSFW_PRESETS, WAIFU_IM_STARTER_TAGS
 from ram_bot.dialogue import build_nsfw_command_reply, record_interaction
 from ram_bot.embeds import build_action_embed
-from ram_bot.gelbooru import download_gelbooru_image, get_gelbooru_post
 from ram_bot.reactions import get_reaction_gif
+from ram_bot.waifu_api import get_waifu_image
 
 
 class RoleplayCog(commands.Cog):
@@ -32,25 +31,32 @@ class RoleplayCog(commands.Cog):
     @commands.command()
     @commands.cooldown(1, 4, commands.BucketType.user)
     async def nsfwcategories(self, ctx):
-        if not await self.ensure_nsfw(ctx):
-            return
-        starters = ", ".join(f"`{tag}`" for tag in GELBOORU_STARTER_TAGS)
+        starters = ", ".join(f"`{tag}`" for tag in WAIFU_IM_STARTER_TAGS)
         await ctx.send(
-            "Starter Gelbooru tags:\n"
+            "Supported Waifu.im tags:\n"
             f"{starters}\n\n"
-            "Ram will always add your global include tags and append your global exclude tags automatically."
+            "Use `!nsfw tag1,tag2` with any of those tags. In DMs or NSFW channels Ram requests explicit images; in regular channels she falls back to SFW."
         )
 
-    async def send_gelbooru_embed(self, ctx, title: str, query: str):
+    def waifu_nsfw_enabled(self, ctx) -> bool:
+        if ctx.guild is None:
+            return True
+        return bool(hasattr(ctx.channel, "is_nsfw") and ctx.channel.is_nsfw())
+
+    async def send_waifu_embed(self, ctx, title: str, included_tags: list[str], *, excluded_tags: list[str] | None = None):
         try:
-            post, tags = await get_gelbooru_post(
-                self.bot.config.gelbooru_auth,
-                self.bot.config.gelbooru_global_include,
-                self.bot.config.gelbooru_global_exclude,
-                query,
+            item, normalized_includes, normalized_excludes = await get_waifu_image(
+                nsfw=self.waifu_nsfw_enabled(ctx),
+                included_tags=included_tags,
+                excluded_tags=excluded_tags or [],
+                animated=False,
             )
-        except RuntimeError:
-            await ctx.send("Gelbooru could not return an image for those tags right now. Try another tag set or use `!nsfwcategories`.")
+        except RuntimeError as error:
+            if str(error) == "invalid_tags":
+                valid_tags = ", ".join(f"`{tag}`" for tag in WAIFU_IM_STARTER_TAGS)
+                await ctx.send(f"Those tags are not supported by Waifu.im. Try one of these instead:\n{valid_tags}")
+                return
+            await ctx.send("Waifu.im could not return an image for those tags right now. Try another tag set or use `!nsfwcategories`.")
             return
 
         scope, profile = self.get_context_profile(ctx)
@@ -62,52 +68,67 @@ class RoleplayCog(commands.Cog):
         embed = discord.Embed(
             title=title,
             description=(
-                f"{ctx.author.mention} requested a Gelbooru image.\n"
-                f"{reply_text}\n"
-                f"Tags: `{tags[:900]}`"
+                f"{ctx.author.mention} requested a Waifu.im image.\n"
+                f"Mode: `{'NSFW' if self.waifu_nsfw_enabled(ctx) else 'SFW'}`"
             ),
             color=discord.Color.from_rgb(248, 186, 203),
             timestamp=ctx.message.created_at,
         )
-        image_file = None
-        attachment_url = None
-        downloaded = await download_gelbooru_image(post["image_url"])
-        if downloaded is not None:
-            content, filename = downloaded
-            image_file = discord.File(BytesIO(content), filename=filename)
-            attachment_url = f"attachment://{filename}"
-            embed.set_image(url=attachment_url)
-        else:
-            embed.set_image(url=post["image_url"])
-        if post.get("fallback_url"):
-            embed.add_field(name="Image Link", value=post["fallback_url"], inline=False)
+        reply_lines = reply_text.splitlines() or [reply_text]
+        embed.add_field(name="Ram", value="\n".join(reply_lines[:2]), inline=False)
+        embed.add_field(name="Included Tags", value=" | ".join(f"`{tag}`" for tag in normalized_includes), inline=False)
+        if normalized_excludes:
+            embed.add_field(name="Excluded Tags", value=" | ".join(f"`{tag}`" for tag in normalized_excludes), inline=False)
+        embed.set_image(url=item["url"])
+        embed.add_field(name="Image Link", value=item["url"], inline=False)
+        source = item.get("source")
+        if source:
+            embed.add_field(name="Source", value=source, inline=False)
         embed.set_footer(text=f"Relationship: {relationship}")
-        if image_file is not None:
-            await ctx.send(embed=embed, file=image_file)
-        else:
-            await ctx.send(embed=embed)
+        await ctx.send(embed=embed)
 
     @commands.command()
     @commands.cooldown(1, 4, commands.BucketType.user)
     async def nsfw(self, ctx, *, category: str):
-        if not await self.ensure_nsfw(ctx):
-            return
-        await self.send_gelbooru_embed(ctx, f"NSFW - {category.lower()}", category)
+        requested_tags = [part.strip() for part in category.split(",") if part.strip()]
+        label = "NSFW" if self.waifu_nsfw_enabled(ctx) else "SFW"
+        await self.send_waifu_embed(ctx, f"{label} - {category.lower()}", requested_tags)
 
     async def send_nsfw_preset(self, ctx, preset_name: str):
-        if not await self.ensure_nsfw(ctx):
-            return
-        await self.send_gelbooru_embed(ctx, f"NSFW - {preset_name}", GELBOORU_NSFW_PRESETS[preset_name])
+        included_tags = list(WAIFU_IM_NSFW_PRESETS[preset_name])
+        excluded_tags = ["ecchi"] if self.waifu_nsfw_enabled(ctx) else []
+        label = "NSFW" if self.waifu_nsfw_enabled(ctx) else "SFW"
+        await self.send_waifu_embed(ctx, f"{label} - {preset_name}", included_tags, excluded_tags=excluded_tags)
 
     @commands.command()
     @commands.cooldown(1, 4, commands.BucketType.user)
-    async def pussy(self, ctx):
-        await self.send_nsfw_preset(ctx, "pussy")
+    async def waifu(self, ctx):
+        await self.send_nsfw_preset(ctx, "waifu")
 
     @commands.command()
     @commands.cooldown(1, 4, commands.BucketType.user)
-    async def tits(self, ctx):
-        await self.send_nsfw_preset(ctx, "tits")
+    async def ero(self, ctx):
+        await self.send_nsfw_preset(ctx, "ero")
+
+    @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def ecchi(self, ctx):
+        await self.send_nsfw_preset(ctx, "ecchi")
+
+    @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def oppai(self, ctx):
+        await self.send_nsfw_preset(ctx, "oppai")
+
+    @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def hentai(self, ctx):
+        await self.send_nsfw_preset(ctx, "hentai")
+
+    @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def milf(self, ctx):
+        await self.send_nsfw_preset(ctx, "milf")
 
     @commands.command()
     @commands.cooldown(1, 4, commands.BucketType.user)
@@ -121,28 +142,13 @@ class RoleplayCog(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1, 4, commands.BucketType.user)
-    async def rammaid(self, ctx):
-        await self.send_nsfw_preset(ctx, "rammaid")
+    async def uniform(self, ctx):
+        await self.send_nsfw_preset(ctx, "uniform")
 
     @commands.command()
     @commands.cooldown(1, 4, commands.BucketType.user)
-    async def remmaid(self, ctx):
-        await self.send_nsfw_preset(ctx, "remmaid")
-
-    @commands.command()
-    @commands.cooldown(1, 4, commands.BucketType.user)
-    async def anal(self, ctx):
-        await self.send_nsfw_preset(ctx, "anal")
-
-    @commands.command()
-    @commands.cooldown(1, 4, commands.BucketType.user)
-    async def thighs(self, ctx):
-        await self.send_nsfw_preset(ctx, "thighs")
-
-    @commands.command()
-    @commands.cooldown(1, 4, commands.BucketType.user)
-    async def blowjob(self, ctx):
-        await self.send_nsfw_preset(ctx, "blowjob")
+    async def selfies(self, ctx):
+        await self.send_nsfw_preset(ctx, "selfies")
 
     @commands.command()
     @commands.cooldown(1, 4, commands.BucketType.user)
@@ -151,133 +157,8 @@ class RoleplayCog(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1, 4, commands.BucketType.user)
-    async def handjob(self, ctx):
-        await self.send_nsfw_preset(ctx, "handjob")
-
-    @commands.command()
-    @commands.cooldown(1, 4, commands.BucketType.user)
-    async def footjob(self, ctx):
-        await self.send_nsfw_preset(ctx, "footjob")
-
-    @commands.command()
-    @commands.cooldown(1, 4, commands.BucketType.user)
-    async def creampie(self, ctx):
-        await self.send_nsfw_preset(ctx, "creampie")
-
-    @commands.command()
-    @commands.cooldown(1, 4, commands.BucketType.user)
-    async def ahegao(self, ctx):
-        await self.send_nsfw_preset(ctx, "ahegao")
-
-    @commands.command()
-    @commands.cooldown(1, 4, commands.BucketType.user)
-    async def stockings(self, ctx):
-        await self.send_nsfw_preset(ctx, "stockings")
-
-    @commands.command()
-    @commands.cooldown(1, 4, commands.BucketType.user)
-    async def bikini(self, ctx):
-        await self.send_nsfw_preset(ctx, "bikini")
-
-    @commands.command(name="naked_apron")
-    @commands.cooldown(1, 4, commands.BucketType.user)
-    async def naked_apron_command(self, ctx):
-        await self.send_nsfw_preset(ctx, "naked_apron")
-
-    @commands.command()
-    @commands.cooldown(1, 4, commands.BucketType.user)
-    async def bondage(self, ctx):
-        await self.send_nsfw_preset(ctx, "bondage")
-
-    @commands.command()
-    @commands.cooldown(1, 4, commands.BucketType.user)
-    async def tentacles(self, ctx):
-        await self.send_nsfw_preset(ctx, "tentacles")
-
-    @commands.command()
-    @commands.cooldown(1, 4, commands.BucketType.user)
-    async def doggystyle(self, ctx):
-        await self.send_nsfw_preset(ctx, "doggystyle")
-
-    @commands.command()
-    @commands.cooldown(1, 4, commands.BucketType.user)
-    async def facial(self, ctx):
-        await self.send_nsfw_preset(ctx, "facial")
-
-    @commands.command()
-    @commands.cooldown(1, 4, commands.BucketType.user)
-    async def thighjob(self, ctx):
-        await self.send_nsfw_preset(ctx, "thighjob")
-
-    @commands.command()
-    @commands.cooldown(1, 4, commands.BucketType.user)
-    async def armpit(self, ctx):
-        await self.send_nsfw_preset(ctx, "armpit")
-
-    @commands.command()
-    @commands.cooldown(1, 4, commands.BucketType.user)
-    async def lingerie(self, ctx):
-        await self.send_nsfw_preset(ctx, "lingerie")
-
-    @commands.command()
-    @commands.cooldown(1, 4, commands.BucketType.user)
-    async def cum(self, ctx):
-        await self.send_nsfw_preset(ctx, "cum")
-
-    @commands.command()
-    @commands.cooldown(1, 4, commands.BucketType.user)
-    async def yuri(self, ctx):
-        await self.send_nsfw_preset(ctx, "yuri")
-
-    @commands.command()
-    @commands.cooldown(1, 4, commands.BucketType.user)
-    async def uniform(self, ctx):
-        await self.send_nsfw_preset(ctx, "uniform")
-
-    @commands.command()
-    @commands.cooldown(1, 4, commands.BucketType.user)
-    async def public(self, ctx):
-        await self.send_nsfw_preset(ctx, "public")
-
-    @commands.command()
-    @commands.cooldown(1, 4, commands.BucketType.user)
-    async def nude(self, ctx):
-        await self.send_nsfw_preset(ctx, "nude")
-
-    @commands.command()
-    @commands.cooldown(1, 4, commands.BucketType.user)
-    async def spread(self, ctx):
-        await self.send_nsfw_preset(ctx, "spread")
-
-    @commands.command()
-    @commands.cooldown(1, 4, commands.BucketType.user)
-    async def missionary(self, ctx):
-        await self.send_nsfw_preset(ctx, "missionary")
-
-    @commands.command()
-    @commands.cooldown(1, 4, commands.BucketType.user)
-    async def cowgirl(self, ctx):
-        await self.send_nsfw_preset(ctx, "cowgirl")
-
-    @commands.command(name="69")
-    @commands.cooldown(1, 4, commands.BucketType.user)
-    async def sixty_nine(self, ctx):
-        await self.send_nsfw_preset(ctx, "69")
-
-    @commands.command()
-    @commands.cooldown(1, 4, commands.BucketType.user)
-    async def nipples(self, ctx):
-        await self.send_nsfw_preset(ctx, "nipples")
-
-    @commands.command()
-    @commands.cooldown(1, 4, commands.BucketType.user)
-    async def panties(self, ctx):
-        await self.send_nsfw_preset(ctx, "panties")
-
-    @commands.command()
-    @commands.cooldown(1, 4, commands.BucketType.user)
-    async def garter(self, ctx):
-        await self.send_nsfw_preset(ctx, "garter")
+    async def oral(self, ctx):
+        await self.send_nsfw_preset(ctx, "oral")
 
     async def post_roleplay_bonus(self, ctx, action_name: str):
         if ctx.guild is None:
