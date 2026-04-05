@@ -1,7 +1,8 @@
+import asyncio
 import discord
 from discord.ext import commands, tasks
 from itertools import cycle
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from ram_bot.config import BotConfig
 from ram_bot.constants import STATUS_MESSAGES
@@ -26,6 +27,8 @@ class RamBot(commands.Bot):
         self.started_at = datetime.now(timezone.utc)
         self.automod_cache = {}
         self.status_messages = cycle(STATUS_MESSAGES)
+        self._temporary_presence_expires_at: datetime | None = None
+        self._presence_lock = asyncio.Lock()
         self.initial_extensions = (
             "ram_bot.cogs.general",
             "ram_bot.cogs.roleplay",
@@ -47,13 +50,31 @@ class RamBot(commands.Bot):
         self.rotate_status.start()
 
     async def on_ready(self):
+        if not self.temporary_presence_active():
+            await self.set_rotating_presence()
         print(f"Logged in as {self.user} with prefix {self.command_prefix}")
 
-    @tasks.loop(minutes=15)
-    async def rotate_status(self):
+    async def set_rotating_presence(self):
         await self.change_presence(
             activity=discord.CustomActivity(name=next(self.status_messages))
         )
+
+    async def set_temporary_presence(self, text: str, *, seconds: int = 15):
+        async with self._presence_lock:
+            self._temporary_presence_expires_at = datetime.now(timezone.utc) + timedelta(seconds=seconds)
+            await self.change_presence(activity=discord.CustomActivity(name=text[:128]))
+
+    def temporary_presence_active(self) -> bool:
+        if self._temporary_presence_expires_at is None:
+            return False
+        return datetime.now(timezone.utc) < self._temporary_presence_expires_at
+
+    @tasks.loop(minutes=10)
+    async def rotate_status(self):
+        async with self._presence_lock:
+            if self.temporary_presence_active():
+                return
+            await self.set_rotating_presence()
 
     @rotate_status.before_loop
     async def before_rotate_status(self):

@@ -6,6 +6,7 @@ class CommandInfo:
     name: str
     usage: str
     description: str
+    guild_only: bool = False
 
 
 @dataclass(frozen=True)
@@ -96,15 +97,15 @@ PROGRESSION_CATEGORY = CategoryInfo(
     label="Progression",
     summary="XP, affinity, streaks, daily routines, and Ram's opinion of you.",
     commands=(
-        CommandInfo("rank", "rank [@user]", "Show a user's XP, level, and affinity with Ram."),
-        CommandInfo("affinity", "affinity [@user]", "See how warm or cold Ram currently feels toward someone."),
-        CommandInfo("leaderboard", "leaderboard", "Show the top users by XP in this server."),
-        CommandInfo("streak", "streak [@user]", "Show a user's current daily reward streak and next bonus milestone."),
-        CommandInfo("daily", "daily", "Claim your main daily reward, build your streak, and earn milestone bonuses."),
-        CommandInfo("checkin", "checkin", "Report in to Ram for a smaller repeatable XP and affinity boost."),
-        CommandInfo("dailyhug", "dailyhug", "Receive one daily hug from Ram for a softer affection-focused bonus."),
-        CommandInfo("setlevelrole", "setlevelrole <level> @role", "Give a role automatically at a specific level."),
-        CommandInfo("clearlevelrole", "clearlevelrole <level>", "Remove a configured level reward role."),
+        CommandInfo("rank", "rank [@user]", "Show a user's XP, level, and affinity with Ram.", guild_only=True),
+        CommandInfo("affinity", "affinity [@user]", "See how warm or cold Ram currently feels toward someone.", guild_only=True),
+        CommandInfo("leaderboard", "leaderboard", "Show the top users by XP in this server.", guild_only=True),
+        CommandInfo("streak", "streak [@user]", "Show a user's current daily reward streak and next bonus milestone.", guild_only=True),
+        CommandInfo("daily", "daily", "Claim your main daily reward, build your streak, and earn milestone bonuses.", guild_only=True),
+        CommandInfo("checkin", "checkin", "Report in to Ram for a smaller repeatable XP and affinity boost.", guild_only=True),
+        CommandInfo("dailyhug", "dailyhug", "Receive one daily hug from Ram for a softer affection-focused bonus.", guild_only=True),
+        CommandInfo("setlevelrole", "setlevelrole <level> @role", "Give a role automatically at a specific level.", guild_only=True),
+        CommandInfo("clearlevelrole", "clearlevelrole <level>", "Remove a configured level reward role.", guild_only=True),
     ),
 )
 
@@ -114,11 +115,11 @@ UTILITY_CATEGORY = CategoryInfo(
     summary="Everyday information, reminders, and polls.",
     commands=(
         CommandInfo("avatar", "avatar [@user]", "Show someone's avatar."),
-        CommandInfo("userinfo", "userinfo [@user]", "Show details about a user."),
-        CommandInfo("serverinfo", "serverinfo", "Show details about the server."),
+        CommandInfo("userinfo", "userinfo [@user]", "Show details about a user.", guild_only=True),
+        CommandInfo("serverinfo", "serverinfo", "Show details about the server.", guild_only=True),
         CommandInfo("uptime", "uptime", "Show how long the bot has been running."),
         CommandInfo("remind", "remind <time> <message>", "Set a reminder in the current channel."),
-        CommandInfo("poll", "poll <question | option 1 | option 2 ...>", "Create a quick reaction poll."),
+        CommandInfo("poll", "poll <question | option 1 | option 2 ...>", "Create a quick reaction poll.", guild_only=True),
     ),
 )
 
@@ -136,7 +137,11 @@ MANAGEMENT_CATEGORY = CategoryInfo(
 )
 
 
-def get_categories(include_management: bool, include_admin_tools: bool = False) -> tuple[CategoryInfo, ...]:
+def visible_commands(commands: tuple[CommandInfo, ...], in_guild: bool) -> tuple[CommandInfo, ...]:
+    return tuple(command for command in commands if in_guild or not command.guild_only)
+
+
+def get_categories(include_management: bool, include_admin_tools: bool = False, in_guild: bool = True) -> tuple[CategoryInfo, ...]:
     categories = [
         GENERAL_CATEGORY,
         ROLEPLAY_CATEGORY,
@@ -147,21 +152,32 @@ def get_categories(include_management: bool, include_admin_tools: bool = False) 
         categories.extend([MODERATION_CATEGORY, SERVER_CATEGORY])
     if include_management:
         categories.append(MANAGEMENT_CATEGORY)
-    return tuple(categories)
+    filtered_categories = []
+    for category in categories:
+        commands = visible_commands(category.commands, in_guild)
+        if commands:
+            filtered_categories.append(
+                CategoryInfo(
+                    name=category.name,
+                    label=category.label,
+                    summary=category.summary,
+                    commands=commands,
+                )
+            )
+    return tuple(filtered_categories)
 
-
-def find_command(query: str, include_management: bool, include_admin_tools: bool = False) -> CommandInfo | None:
+def find_command(query: str, include_management: bool, include_admin_tools: bool = False, in_guild: bool = True) -> CommandInfo | None:
     lowered = query.lower()
-    for category in get_categories(include_management, include_admin_tools):
+    for category in get_categories(include_management, include_admin_tools, in_guild):
         for command in category.commands:
             if command.name == lowered:
                 return command
     return None
 
 
-def find_category(query: str, include_management: bool, include_admin_tools: bool = False) -> CategoryInfo | None:
+def find_category(query: str, include_management: bool, include_admin_tools: bool = False, in_guild: bool = True) -> CategoryInfo | None:
     lowered = query.lower()
-    for category in get_categories(include_management, include_admin_tools):
+    for category in get_categories(include_management, include_admin_tools, in_guild):
         if category.name.lower() == lowered:
             return category
     return None

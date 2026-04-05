@@ -28,6 +28,16 @@ class RoleplayCog(commands.Cog):
         profile["last_roleplay_action"] = action_name
         profile["last_roleplay_at"] = now.isoformat()
         self.bot.user_profiles.save_profile(f"guild:{ctx.guild.id}", ctx.author.id, profile)
+        event_statuses = {
+            "hug": "Delivering hugs with reluctance",
+            "kiss": "Pretending not to notice the flirting",
+            "cuddle": "Allowing brief affection",
+            "glare": "Watching someone with disappointment",
+            "cry": "Enduring an inconvenient emotional moment",
+        }
+        status = event_statuses.get(action_name)
+        if status:
+            await self.bot.set_temporary_presence(status, seconds=12)
 
     async def send_self_action(self, ctx, action_name: str, title: str, description: str):
         gif_url = await get_reaction_gif(action_name)

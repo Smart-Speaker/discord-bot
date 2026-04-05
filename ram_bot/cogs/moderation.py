@@ -37,6 +37,7 @@ class ModerationCog(commands.Cog):
             gif_url=gif_url,
         )
         await ctx.send(embed=embed)
+        await self.bot.set_temporary_presence("Rejecting inefficient self-removal attempts", seconds=18)
 
     @commands.command()
     @commands.has_permissions(administrator=True)
@@ -57,6 +58,7 @@ class ModerationCog(commands.Cog):
             title=f"{ctx.author.display_name} kicked {member.display_name}",
             description=f"{member.mention} was kicked.\nReason: `{reason}`",
         )
+        await self.bot.set_temporary_presence("Removing another inconvenience", seconds=18)
 
     @commands.command()
     @commands.has_permissions(administrator=True)
@@ -77,6 +79,7 @@ class ModerationCog(commands.Cog):
             title=f"{ctx.author.display_name} banned {member.display_name}",
             description=f"{member.mention} was banned.\nReason: `{reason}`",
         )
+        await self.bot.set_temporary_presence("Permanently correcting a mistake", seconds=18)
 
     @commands.command()
     @commands.has_permissions(administrator=True)

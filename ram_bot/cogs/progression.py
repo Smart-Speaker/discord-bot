@@ -233,6 +233,7 @@ class ProgressionCog(commands.Cog):
             description=description,
             reaction="yay",
         )
+        await self.bot.set_temporary_presence("Distributing rewards with reluctance", seconds=14)
 
     @commands.command()
     @commands.guild_only()
@@ -257,6 +258,7 @@ class ProgressionCog(commands.Cog):
             ),
             reaction="thumbsup",
         )
+        await self.bot.set_temporary_presence("Keeping track of who checked in", seconds=12)
 
     @commands.command()
     @commands.guild_only()
@@ -281,6 +283,7 @@ class ProgressionCog(commands.Cog):
             ),
             reaction="cuddle" if affinity_tier(profile["affinity"]) in {"warm", "close"} else "hug",
         )
+        await self.bot.set_temporary_presence("Giving out one daily hug", seconds=12)
 
     @commands.command()
     @commands.guild_only()
@@ -332,6 +335,7 @@ class ProgressionCog(commands.Cog):
             )
             embed.set_image(url=await get_reaction_gif("celebrate"))
             await message.channel.send(embed=embed)
+            await self.bot.set_temporary_presence(f"Watching someone reach level {new_level}", seconds=16)
 
 
 async def setup(bot):

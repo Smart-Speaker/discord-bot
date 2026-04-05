@@ -266,6 +266,7 @@ class ServerCog(commands.Cog):
         )
         embed.set_image(url=GUILD_JOIN_GIF_URL)
         await channel.send(embed=embed)
+        await self.bot.set_temporary_presence("Arriving somewhere new and already unimpressed", seconds=20)
 
 
 async def setup(bot):

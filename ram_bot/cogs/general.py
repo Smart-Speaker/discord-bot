@@ -69,13 +69,20 @@ class GeneralCog(commands.Cog):
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def help_command(self, ctx, *, query: str | None = None):
         include_management = self.bot.is_owner(ctx.author.id) and ctx.guild is None
-        include_admin_tools = bool(ctx.guild and ctx.author.guild_permissions.administrator)
+        include_admin_tools = bool(
+            ctx.guild and (
+                ctx.author.guild_permissions.administrator
+                or ctx.guild.owner_id == ctx.author.id
+            )
+        )
+        in_guild = ctx.guild is not None
 
         if not query:
             pages = build_help_pages(
                 prefix=self.bot.command_prefix,
                 include_management=include_management,
                 include_admin_tools=include_admin_tools,
+                in_guild=in_guild,
             )
             if len(pages) == 1:
                 await ctx.send(embed=pages[0])
@@ -83,7 +90,7 @@ class GeneralCog(commands.Cog):
                 await ctx.send(embed=pages[0], view=HelpPaginator(ctx.author.id, pages))
             return
 
-        command = find_command(query, include_management, include_admin_tools)
+        command = find_command(query, include_management, include_admin_tools, in_guild)
         if command is not None:
             await ctx.send(
                 embed=build_command_help_embed(
@@ -93,7 +100,7 @@ class GeneralCog(commands.Cog):
             )
             return
 
-        category = find_category(query, include_management, include_admin_tools)
+        category = find_category(query, include_management, include_admin_tools, in_guild)
         if category is not None:
             pages = build_category_help_pages(
                 prefix=self.bot.command_prefix,
