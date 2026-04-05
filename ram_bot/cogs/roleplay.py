@@ -1,11 +1,12 @@
 import discord
+from io import BytesIO
 from datetime import datetime, timezone
 from discord.ext import commands
 
 from ram_bot.constants import GELBOORU_NSFW_PRESETS, GELBOORU_STARTER_TAGS
 from ram_bot.dialogue import build_nsfw_command_reply, record_interaction
 from ram_bot.embeds import build_action_embed
-from ram_bot.gelbooru import get_gelbooru_post
+from ram_bot.gelbooru import download_gelbooru_image, get_gelbooru_post
 from ram_bot.reactions import get_reaction_gif
 
 
@@ -68,11 +69,23 @@ class RoleplayCog(commands.Cog):
             color=discord.Color.from_rgb(248, 186, 203),
             timestamp=ctx.message.created_at,
         )
-        embed.set_image(url=post["image_url"])
+        image_file = None
+        attachment_url = None
+        downloaded = await download_gelbooru_image(post["image_url"])
+        if downloaded is not None:
+            content, filename = downloaded
+            image_file = discord.File(BytesIO(content), filename=filename)
+            attachment_url = f"attachment://{filename}"
+            embed.set_image(url=attachment_url)
+        else:
+            embed.set_image(url=post["image_url"])
         if post.get("fallback_url"):
             embed.add_field(name="Image Link", value=post["fallback_url"], inline=False)
         embed.set_footer(text=f"Relationship: {relationship}")
-        await ctx.send(embed=embed)
+        if image_file is not None:
+            await ctx.send(embed=embed, file=image_file)
+        else:
+            await ctx.send(embed=embed)
 
     @commands.command()
     @commands.cooldown(1, 4, commands.BucketType.user)

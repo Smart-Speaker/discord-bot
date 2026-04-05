@@ -1,8 +1,9 @@
 import asyncio
 import json
+from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlparse
-from urllib.request import urlopen
+from urllib.request import Request, urlopen
 
 from ram_bot.constants import GELBOORU_API_URL
 
@@ -52,7 +53,8 @@ def _fetch_post(tags: str, auth_suffix: str) -> dict | None:
     request_url = f"{GELBOORU_API_URL}&tags={quote(tags, safe=':+-_()')}{auth_suffix}"
 
     try:
-        with urlopen(request_url, timeout=15) as response:
+        request = Request(request_url, headers={"User-Agent": "RamDiscordBot/1.0"})
+        with urlopen(request, timeout=15) as response:
             payload = json.loads(response.read().decode("utf-8"))
     except (HTTPError, URLError, TimeoutError, json.JSONDecodeError):
         return None
@@ -90,3 +92,22 @@ async def get_gelbooru_post(auth_suffix: str, include_csv: str, exclude_csv: str
     if not post:
         raise RuntimeError("request_failed")
     return post, tags
+
+
+def _download_image(url: str) -> tuple[bytes, str] | None:
+    try:
+        request = Request(url, headers={"User-Agent": "RamDiscordBot/1.0", "Referer": "https://gelbooru.com/"})
+        with urlopen(request, timeout=20) as response:
+            content = response.read()
+    except (HTTPError, URLError, TimeoutError):
+        return None
+
+    path = Path(urlparse(url).path)
+    suffix = path.suffix.lower() if path.suffix else ".png"
+    if suffix not in {".jpg", ".jpeg", ".png", ".gif", ".webp"}:
+        suffix = ".png"
+    return content, f"gelbooru{suffix}"
+
+
+async def download_gelbooru_image(url: str) -> tuple[bytes, str] | None:
+    return await asyncio.to_thread(_download_image, url)
