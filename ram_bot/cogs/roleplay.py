@@ -106,13 +106,13 @@ class RoleplayCog(commands.Cog):
 
     @commands.command()
     @commands.cooldown(1, 4, commands.BucketType.user)
-    async def ram(self, ctx):
-        await self.send_nsfw_preset(ctx, "ram")
+    async def rammaid(self, ctx):
+        await self.send_nsfw_preset(ctx, "rammaid")
 
     @commands.command()
     @commands.cooldown(1, 4, commands.BucketType.user)
-    async def rem(self, ctx):
-        await self.send_nsfw_preset(ctx, "rem")
+    async def remmaid(self, ctx):
+        await self.send_nsfw_preset(ctx, "remmaid")
 
     @commands.command()
     @commands.cooldown(1, 4, commands.BucketType.user)
