@@ -69,6 +69,8 @@ class RoleplayCog(commands.Cog):
             timestamp=ctx.message.created_at,
         )
         embed.set_image(url=post["image_url"])
+        if post.get("fallback_url"):
+            embed.add_field(name="Image Link", value=post["fallback_url"], inline=False)
         embed.set_footer(text=f"Relationship: {relationship}")
         await ctx.send(embed=embed)
 

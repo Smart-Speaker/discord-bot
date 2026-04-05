@@ -1,7 +1,7 @@
 import asyncio
 import json
 from urllib.error import HTTPError, URLError
-from urllib.parse import quote
+from urllib.parse import quote, urlparse
 from urllib.request import urlopen
 
 from ram_bot.constants import GELBOORU_API_URL
@@ -41,6 +41,13 @@ def normalize_image_url(url: str | None) -> str | None:
     return cleaned
 
 
+def is_supported_embed_image(url: str | None) -> bool:
+    if not url:
+        return False
+    path = urlparse(url).path.lower()
+    return path.endswith((".jpg", ".jpeg", ".png", ".gif", ".webp"))
+
+
 def _fetch_post(tags: str, auth_suffix: str) -> dict | None:
     request_url = f"{GELBOORU_API_URL}&tags={quote(tags, safe=':+-_()')}{auth_suffix}"
 
@@ -59,13 +66,20 @@ def _fetch_post(tags: str, auth_suffix: str) -> dict | None:
     for post in posts:
         if not isinstance(post, dict):
             continue
-        image_url = (
-            normalize_image_url(post.get("sample_url"))
-            or normalize_image_url(post.get("file_url"))
-            or normalize_image_url(post.get("preview_url"))
-        )
+        candidates = [
+            normalize_image_url(post.get("sample_url")),
+            normalize_image_url(post.get("file_url")),
+            normalize_image_url(post.get("preview_url")),
+        ]
+        image_url = next((candidate for candidate in candidates if is_supported_embed_image(candidate)), None)
+        fallback_url = next((candidate for candidate in candidates if candidate), None)
         if image_url:
             post["image_url"] = image_url
+            post["fallback_url"] = fallback_url or image_url
+            return post
+        if fallback_url:
+            post["image_url"] = fallback_url
+            post["fallback_url"] = fallback_url
             return post
     return None
 
