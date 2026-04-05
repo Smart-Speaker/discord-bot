@@ -101,6 +101,15 @@ def build_command_help_embed(prefix: str, command: CommandInfo) -> discord.Embed
         color=brand_color(),
     )
     embed.add_field(name="Usage", value=f"`{prefix}{command.usage}`", inline=False)
+    availability = []
+    if command.guild_only:
+        availability.append("Server only")
+    if command.dm_only:
+        availability.append("DM only")
+    if command.nsfw_only:
+        availability.append("DMs or NSFW channels only")
+    if availability:
+        embed.add_field(name="Availability", value=", ".join(availability), inline=False)
     embed.add_field(name="Category Tip", value=f"Use `{prefix}help` to open the full menu.", inline=False)
     return embed
 

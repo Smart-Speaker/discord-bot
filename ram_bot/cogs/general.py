@@ -4,7 +4,15 @@ from discord.ext import commands
 
 from ram_bot.catalog import find_category, find_command
 from ram_bot.constants import RAM_AI_UNAVAILABLE_REPLIES
-from ram_bot.dialogue import build_dialogue_reply, record_interaction
+from ram_bot.dialogue import (
+    DM_MOOD_ALIASES,
+    DM_RELATIONSHIP_ALIASES,
+    build_dialogue_reply,
+    dm_relationship_label,
+    normalize_dm_mood,
+    normalize_dm_relationship,
+    record_interaction,
+)
 from ram_bot.embeds import (
     build_category_help_pages,
     build_command_help_embed,
@@ -133,6 +141,47 @@ class GeneralCog(commands.Cog):
         reply = build_dialogue_reply(self.bot, ctx, "greeting")
         await ctx.reply(reply[:2000], mention_author=True)
         record_interaction(self.bot, ctx, "greeting")
+
+    @commands.command()
+    @commands.dm_only()
+    @commands.cooldown(1, 3, commands.BucketType.user)
+    async def setrelationship(self, ctx, *, relationship: str):
+        profile = self.bot.user_profiles.get_profile(f"dm:{ctx.author.id}", ctx.author.id)
+        normalized = normalize_dm_relationship(relationship)
+        profile["dm_relationship"] = normalized
+        self.bot.user_profiles.save_profile(f"dm:{ctx.author.id}", ctx.author.id, profile)
+        valid = ", ".join(f"`{name}`" for name in ("not_friends", "freinds", "partners", "waifu", "soulmate"))
+        if relationship.strip().lower().replace(" ", "_") not in DM_RELATIONSHIP_ALIASES:
+            await ctx.send(f"Ram defaulted that to `{dm_relationship_label(normalized)}`. Valid choices are: {valid}")
+            return
+        await ctx.send(f"Ram's DM relationship for you is now set to `{dm_relationship_label(normalized)}`.")
+
+    @commands.command()
+    @commands.dm_only()
+    @commands.cooldown(1, 3, commands.BucketType.user)
+    async def setmood(self, ctx, *, mood: str):
+        profile = self.bot.user_profiles.get_profile(f"dm:{ctx.author.id}", ctx.author.id)
+        normalized = normalize_dm_mood(mood)
+        profile["dm_mood"] = normalized
+        self.bot.user_profiles.save_profile(f"dm:{ctx.author.id}", ctx.author.id, profile)
+        valid = ", ".join(f"`{name}`" for name in ("neutral", "sleepy", "annoyed", "happy", "flirty", "protective"))
+        if mood.strip().lower().replace(" ", "_") not in DM_MOOD_ALIASES:
+            await ctx.send(f"Ram defaulted that to `{normalized.title()}`. Valid choices are: {valid}")
+            return
+        await ctx.send(f"Ram's DM mood for you is now set to `{normalized.title()}`.")
+
+    @commands.command()
+    @commands.dm_only()
+    @commands.cooldown(1, 3, commands.BucketType.user)
+    async def dmstate(self, ctx):
+        profile = self.bot.user_profiles.get_profile(f"dm:{ctx.author.id}", ctx.author.id)
+        relationship = dm_relationship_label(profile.get("dm_relationship"))
+        mood = normalize_dm_mood(profile.get("dm_mood")).title()
+        await ctx.send(
+            f"Ram's DM state for you is currently:\n"
+            f"- Relationship: `{relationship}`\n"
+            f"- Mood: `{mood}`"
+        )
 
     @commands.command()
     @commands.cooldown(1, 8, commands.BucketType.user)

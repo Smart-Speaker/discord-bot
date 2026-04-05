@@ -125,6 +125,9 @@ class RamBot(commands.Bot):
         if isinstance(error, commands.NoPrivateMessage):
             await ctx.send("That command can only be used in a server.")
             return
+        if isinstance(error, commands.PrivateMessageOnly):
+            await ctx.send("That command can only be used in my DMs.")
+            return
         if isinstance(error, discord.Forbidden):
             await ctx.send("I do not have enough Discord permissions to do that.")
             return

@@ -288,6 +288,41 @@ RELATIONSHIP_LABELS = {
     "soulmate": "Soulmate",
 }
 
+DM_RELATIONSHIP_LABELS = {
+    "not_friends": "Not Friends",
+    "friends": "Freinds",
+    "partners": "Partners",
+    "waifu": "Waifu",
+    "soulmate": "Soulmate",
+}
+
+DM_RELATIONSHIP_TO_AFFINITY = {
+    "not_friends": "cold",
+    "friends": "neutral",
+    "partners": "warm",
+    "waifu": "close",
+    "soulmate": "very_close",
+}
+
+DM_RELATIONSHIP_ALIASES = {
+    "notfriends": "not_friends",
+    "not_friends": "not_friends",
+    "friends": "friends",
+    "freinds": "friends",
+    "partners": "partners",
+    "waifu": "waifu",
+    "soulmate": "soulmate",
+}
+
+DM_MOOD_ALIASES = {
+    "neutral": "neutral",
+    "sleepy": "sleepy",
+    "annoyed": "annoyed",
+    "happy": "happy",
+    "flirty": "flirty",
+    "protective": "protective",
+}
+
 RELATIONSHIP_LINES = {
     "not_friends": (
         "Ram is only tolerating this because she feels generous.",
@@ -531,6 +566,10 @@ def _profile(bot, source) -> dict:
     return bot.user_profiles.get_profile(_scope_id(source), author.id)
 
 
+def _is_dm_source(source) -> bool:
+    return getattr(source, "guild", None) is None
+
+
 def _parse_iso(value: str | None) -> datetime | None:
     if not value:
         return None
@@ -563,6 +602,31 @@ def relationship_tier(value: int) -> str:
 
 def relationship_label(value: int) -> str:
     return RELATIONSHIP_LABELS[relationship_tier(value)]
+
+
+def normalize_dm_relationship(value: str | None) -> str:
+    if not value:
+        return "friends"
+    normalized = value.strip().lower().replace(" ", "_")
+    return DM_RELATIONSHIP_ALIASES.get(normalized, "friends")
+
+
+def normalize_dm_mood(value: str | None) -> str:
+    if not value:
+        return "neutral"
+    normalized = value.strip().lower().replace(" ", "_")
+    return DM_MOOD_ALIASES.get(normalized, "neutral")
+
+
+def dm_relationship_label(value: str | None) -> str:
+    return DM_RELATIONSHIP_LABELS[normalize_dm_relationship(value)]
+
+
+def current_relationship_label(bot, source) -> str:
+    profile = _profile(bot, source)
+    if _is_dm_source(source):
+        return dm_relationship_label(profile.get("dm_relationship"))
+    return relationship_label(profile.get("affinity", 0))
 
 
 def _time_of_day(now: datetime) -> str | None:
@@ -600,9 +664,17 @@ def record_interaction(bot, source, interaction_type: str):
 def build_dialogue_reply(bot, source, interaction_type: str, *, special_event: str | None = None) -> str:
     profile = _profile(bot, source)
     now = datetime.now(timezone.utc)
-    affinity = _affinity_tier(profile.get("affinity", 0))
     guild = getattr(source, "guild", None)
     channel = getattr(source, "channel", None)
+    in_dm = guild is None
+    if in_dm:
+        relationship = normalize_dm_relationship(profile.get("dm_relationship"))
+        affinity = DM_RELATIONSHIP_TO_AFFINITY[relationship]
+        manual_mood = normalize_dm_mood(profile.get("dm_mood"))
+    else:
+        relationship = relationship_tier(profile.get("affinity", 0))
+        affinity = _affinity_tier(profile.get("affinity", 0))
+        manual_mood = "neutral"
     recent_short = _recent(profile, now, timedelta(minutes=5))
     recent_long = _recent(profile, now, timedelta(minutes=2))
     last_interaction_at = _parse_iso(profile.get("last_interaction_at"))
@@ -629,6 +701,8 @@ def build_dialogue_reply(bot, source, interaction_type: str, *, special_event: s
         mood = "annoyed"
     elif special_event == "protective":
         mood = "protective"
+    elif in_dm and manual_mood != "neutral":
+        mood = manual_mood
     elif intimate_context and interaction_type in {"mention", "greeting", "airkiss", "kiss", "lick", "love", "bite"} and affinity in {"close", "very_close"}:
         mood = "flirty"
         if affinity == "very_close" and recent_intimate >= 3:
@@ -672,18 +746,29 @@ def build_dialogue_reply(bot, source, interaction_type: str, *, special_event: s
 
 def build_nsfw_command_reply(bot, source, command_name: str) -> tuple[str, str]:
     profile = _profile(bot, source)
-    affinity_value = profile.get("affinity", 0)
-    relationship = relationship_tier(affinity_value)
-    relationship_text = RELATIONSHIP_LABELS[relationship]
+    if _is_dm_source(source):
+        relationship = normalize_dm_relationship(profile.get("dm_relationship"))
+        relationship_text = DM_RELATIONSHIP_LABELS[relationship]
+        manual_mood = normalize_dm_mood(profile.get("dm_mood"))
+    else:
+        affinity_value = profile.get("affinity", 0)
+        relationship = relationship_tier(affinity_value)
+        relationship_text = RELATIONSHIP_LABELS[relationship]
+        manual_mood = "neutral"
     now = datetime.now(timezone.utc)
     recent_short = _recent(profile, now, timedelta(minutes=10))
     recent_intimate = sum(1 for entry in recent_short if entry.get("type") in NSFW_COMMAND_LINES or entry.get("type") in {"kiss", "lick", "love", "bite", "airkiss"})
 
-    mood = "flirty"
+    if manual_mood == "flirty":
+        mood = "flirty"
+    else:
+        mood = "flirty"
     if relationship in {"waifu", "soulmate"} and recent_intimate >= 3:
         mood = "horny"
     if relationship == "soulmate" and recent_intimate >= 5:
         mood = "desperate"
+    if manual_mood == "flirty":
+        mood = "flirty"
 
     base_line = random.choice(NSFW_COMMAND_LINES.get(command_name, NSFW_COMMAND_LINES["maid"]))
     mood_line = random.choice(NSFW_MOOD_LINES[mood])

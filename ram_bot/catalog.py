@@ -7,6 +7,7 @@ class CommandInfo:
     usage: str
     description: str
     guild_only: bool = False
+    dm_only: bool = False
     nsfw_only: bool = False
 
 
@@ -26,6 +27,9 @@ GENERAL_CATEGORY = CategoryInfo(
         CommandInfo("help", "help [command/category]", "Show the help menu or details for a command."),
         CommandInfo("ping", "ping", "Check whether the bot is online."),
         CommandInfo("hello", "hello", "Get a friendly greeting from Ram."),
+        CommandInfo("setrelationship", "setrelationship <not_friends|freinds|partners|waifu|soulmate>", "Set Ram's DM-only relationship state for how she should respond to you there.", dm_only=True),
+        CommandInfo("setmood", "setmood <neutral|sleepy|annoyed|happy|flirty|protective>", "Set Ram's DM-only mood so her replies stay in that tone.", dm_only=True),
+        CommandInfo("dmstate", "dmstate", "Show Ram's current DM-only relationship and mood settings for you.", dm_only=True),
     ),
 )
 
@@ -58,22 +62,22 @@ ROLEPLAY_CATEGORY = CategoryInfo(
 NSFW_CATEGORY = CategoryInfo(
     name="NSFW",
     label="NSFW",
-    summary="Waifu.im image pulls that switch between SFW and NSFW based on channel context.",
+    summary="Waifu.im image pulls that switch between SFW and NSFW based on channel context. Each tag below fetches that specific style.",
     commands=(
-        CommandInfo("nsfw", "nsfw <tag[,tag2,...]>", "Fetch a Waifu.im image using one or more supported tags.", nsfw_only=False),
+        CommandInfo("nsfw", "nsfw <tag[,tag2,...]>", "Fetch a Waifu.im image using one or more supported tags from this category.", nsfw_only=False),
         CommandInfo("nsfwcategories", "nsfwcategories", "Show the supported Waifu.im tags Ram can use.", nsfw_only=False),
-        CommandInfo("waifu", "waifu", "Fetch a Waifu-tagged image.", nsfw_only=False),
-        CommandInfo("ero", "ero", "Fetch an erotic Waifu.im image.", nsfw_only=False),
-        CommandInfo("ecchi", "ecchi", "Fetch a softer ecchi Waifu.im image.", nsfw_only=False),
-        CommandInfo("oppai", "oppai", "Fetch an oppai-tagged Waifu.im image.", nsfw_only=False),
-        CommandInfo("hentai", "hentai", "Fetch a hentai-tagged Waifu.im image.", nsfw_only=False),
-        CommandInfo("milf", "milf", "Fetch a milf-tagged Waifu.im image.", nsfw_only=False),
-        CommandInfo("uniform", "uniform", "Fetch a uniform-tagged Waifu.im image.", nsfw_only=False),
-        CommandInfo("ass", "ass", "Fetch an ass-tagged Waifu.im image.", nsfw_only=False),
-        CommandInfo("maid", "maid", "Fetch a maid-tagged Waifu.im image.", nsfw_only=False),
-        CommandInfo("selfies", "selfies", "Fetch a selfies-tagged Waifu.im image.", nsfw_only=False),
-        CommandInfo("paizuri", "paizuri", "Fetch a paizuri-tagged Waifu.im image.", nsfw_only=False),
-        CommandInfo("oral", "oral", "Fetch an oral-tagged Waifu.im image.", nsfw_only=False),
+        CommandInfo("waifu", "waifu", "Female anime or manga character art.", nsfw_only=False),
+        CommandInfo("ero", "ero", "Erotic content with a stronger adult tone.", nsfw_only=False),
+        CommandInfo("ecchi", "ecchi", "Softer sexual content with nudity but no visible genital detail.", nsfw_only=False),
+        CommandInfo("oppai", "oppai", "Large-breasted women.", nsfw_only=False),
+        CommandInfo("hentai", "hentai", "Explicit sexual content.", nsfw_only=False),
+        CommandInfo("milf", "milf", "Sexually attractive older women.", nsfw_only=False),
+        CommandInfo("uniform", "uniform", "Women wearing uniforms, cosplay, or similar outfits.", nsfw_only=False),
+        CommandInfo("ass", "ass", "Women with an emphasized butt focus.", nsfw_only=False),
+        CommandInfo("maid", "maid", "Cute women in maid outfits.", nsfw_only=False),
+        CommandInfo("selfies", "selfies", "Photo-like selfie styled anime images.", nsfw_only=False),
+        CommandInfo("paizuri", "paizuri", "Breast-focused explicit content.", nsfw_only=False),
+        CommandInfo("oral", "oral", "Oral sex themed content.", nsfw_only=False),
         CommandInfo("lick", "lick [@user]", "Send a mischievous licking reaction.", nsfw_only=True),
         CommandInfo("bite", "bite [@user]", "Bite someone in a more heated playful way.", nsfw_only=True),
         CommandInfo("love", "love [@user]", "Show stronger affectionate interest in an NSFW channel.", nsfw_only=True),
@@ -143,7 +147,7 @@ UTILITY_CATEGORY = CategoryInfo(
         CommandInfo("userinfo", "userinfo [@user]", "Show details about a user.", guild_only=True),
         CommandInfo("serverinfo", "serverinfo", "Show details about the server.", guild_only=True),
         CommandInfo("uptime", "uptime", "Show how long the bot has been running."),
-        CommandInfo("remind", "remind <time> <message>", "Set a reminder in the current channel."),
+        CommandInfo("remind", "remind <time> <message>", "Set a reminder that Ram will DM to you at the chosen time."),
         CommandInfo("poll", "poll <question | option 1 | option 2 ...>", "Create a quick reaction poll.", guild_only=True),
     ),
 )
@@ -166,7 +170,9 @@ def visible_commands(commands: tuple[CommandInfo, ...], in_guild: bool, in_nsfw_
     return tuple(
         command
         for command in commands
-        if (in_guild or not command.guild_only) and (in_nsfw_context or not command.nsfw_only)
+        if (in_guild or not command.guild_only)
+        and ((not in_guild) or not command.dm_only)
+        and (in_nsfw_context or not command.nsfw_only)
     )
 
 

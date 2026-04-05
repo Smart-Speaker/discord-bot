@@ -94,7 +94,7 @@ class UtilityCog(commands.Cog):
             "due_at": due_at.isoformat(),
         }
         self.bot.reminders.add(reminder)
-        await ctx.send(f"Reminder set for {discord.utils.format_dt(due_at, style='R')}.")
+        await ctx.send(f"Ram will DM that reminder to you {discord.utils.format_dt(due_at, style='R')}.")
 
     @commands.command()
     @commands.guild_only()
@@ -132,11 +132,26 @@ class UtilityCog(commands.Cog):
 
         remove_ids = set()
         for reminder in due:
-            channel = self.bot.get_channel(reminder["channel_id"])
-            if channel is None:
+            user = self.bot.get_user(reminder["user_id"])
+            if user is None:
+                try:
+                    user = await self.bot.fetch_user(reminder["user_id"])
+                except (discord.NotFound, discord.HTTPException):
+                    remove_ids.add(reminder["id"])
+                    continue
+            embed = discord.Embed(
+                title="Reminder",
+                description=reminder["message"],
+                color=brand_color(),
+                timestamp=now,
+            )
+            if reminder.get("guild_id"):
+                embed.add_field(name="From", value="A server reminder you asked Ram to keep.", inline=False)
+            try:
+                await user.send(embed=embed)
+            except discord.Forbidden:
                 remove_ids.add(reminder["id"])
                 continue
-            await channel.send(f"<@{reminder['user_id']}> Reminder: {reminder['message']}")
             remove_ids.add(reminder["id"])
 
         self.bot.reminders.remove_ids(remove_ids)

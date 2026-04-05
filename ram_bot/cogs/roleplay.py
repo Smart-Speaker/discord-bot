@@ -96,9 +96,8 @@ class RoleplayCog(commands.Cog):
 
     async def send_nsfw_preset(self, ctx, preset_name: str):
         included_tags = list(WAIFU_IM_NSFW_PRESETS[preset_name])
-        excluded_tags = ["ecchi"] if self.waifu_nsfw_enabled(ctx) else []
         label = "NSFW" if self.waifu_nsfw_enabled(ctx) else "SFW"
-        await self.send_waifu_embed(ctx, f"{label} - {preset_name}", included_tags, excluded_tags=excluded_tags)
+        await self.send_waifu_embed(ctx, f"{label} - {preset_name}", included_tags)
 
     @commands.command()
     @commands.cooldown(1, 4, commands.BucketType.user)

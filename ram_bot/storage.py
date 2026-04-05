@@ -66,10 +66,14 @@ class UserProfileStore(JsonStore):
                 "last_roleplay_at": None,
                 "last_roleplay_action": None,
                 "recent_interactions": [],
+                "dm_relationship": "friends",
+                "dm_mood": "neutral",
             },
         )
         profile.setdefault("last_interaction_at", None)
         profile.setdefault("recent_interactions", [])
+        profile.setdefault("dm_relationship", "friends")
+        profile.setdefault("dm_mood", "neutral")
         return profile
 
     def all_profiles(self, scope_id: str) -> dict[str, dict[str, Any]]:
