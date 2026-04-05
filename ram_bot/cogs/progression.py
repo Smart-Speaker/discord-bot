@@ -22,6 +22,7 @@ from ram_bot.constants import (
     STREAK_MILESTONE,
     XP_PER_MESSAGE_RANGE,
 )
+from ram_bot.dialogue import relationship_label
 from ram_bot.embeds import brand_color
 from ram_bot.reactions import get_reaction_gif
 
@@ -47,6 +48,8 @@ def level_from_xp(xp: int) -> int:
 
 
 def affinity_tier(affinity: int) -> str:
+    if affinity >= 300:
+        return "very_close"
     if affinity >= 150:
         return "close"
     if affinity >= 75:
@@ -123,10 +126,11 @@ class ProgressionCog(commands.Cog):
         embed.add_field(name="Level", value=str(current_level), inline=True)
         embed.add_field(name="XP", value=str(profile["xp"]), inline=True)
         embed.add_field(name="Affinity", value=f"{profile['affinity']} ({tier.title()})", inline=True)
+        embed.add_field(name="Relationship", value=relationship_label(profile["affinity"]), inline=True)
         embed.add_field(
             name="Progress",
             value=f"`{progress_xp}/{needed_xp} XP` to level `{current_level + 1}`",
-            inline=False,
+            inline=True,
         )
         milestone = next_level_milestone(current_level)
         embed.add_field(
@@ -152,6 +156,7 @@ class ProgressionCog(commands.Cog):
         )
         embed.add_field(name="Affinity", value=str(profile["affinity"]), inline=True)
         embed.add_field(name="Tier", value=tier.title(), inline=True)
+        embed.add_field(name="Relationship", value=relationship_label(profile["affinity"]), inline=True)
         embed.set_image(url=await get_reaction_gif("blush" if tier in {"warm", "close"} else "smile"))
         await ctx.send(embed=embed)
 
@@ -281,7 +286,7 @@ class ProgressionCog(commands.Cog):
                 f"{random.choice(DAILY_HUG_LINES)}\n"
                 f"{ctx.author.mention} received `+{DAILY_HUG_XP_REWARD} XP` and `+{DAILY_HUG_AFFINITY_REWARD} affinity`."
             ),
-            reaction="cuddle" if affinity_tier(profile["affinity"]) in {"warm", "close"} else "hug",
+            reaction="cuddle" if affinity_tier(profile["affinity"]) in {"warm", "close", "very_close"} else "hug",
         )
         await self.bot.set_temporary_presence("Giving out one daily hug", seconds=12)
 

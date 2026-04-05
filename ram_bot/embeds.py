@@ -19,8 +19,14 @@ def format_command_rows(commands: tuple[CommandInfo, ...], per_row: int = 3, lim
     return "\n".join(f"- {row}" for row in rows)
 
 
-def build_help_embed(prefix: str, include_management: bool, include_admin_tools: bool = False, in_guild: bool = True) -> discord.Embed:
-    categories = list(get_categories(include_management, include_admin_tools, in_guild))
+def build_help_embed(
+    prefix: str,
+    include_management: bool,
+    include_admin_tools: bool = False,
+    in_guild: bool = True,
+    in_nsfw_context: bool = False,
+) -> discord.Embed:
+    categories = list(get_categories(include_management, include_admin_tools, in_guild, in_nsfw_context))
 
     embed = discord.Embed(
         title="Help Menu - Ram's Guide For Beginners",
@@ -59,8 +65,14 @@ def build_help_embed(prefix: str, include_management: bool, include_admin_tools:
     return embed
 
 
-def build_help_pages(prefix: str, include_management: bool, include_admin_tools: bool = False, in_guild: bool = True) -> list[discord.Embed]:
-    categories = list(get_categories(include_management, include_admin_tools, in_guild))
+def build_help_pages(
+    prefix: str,
+    include_management: bool,
+    include_admin_tools: bool = False,
+    in_guild: bool = True,
+    in_nsfw_context: bool = False,
+) -> list[discord.Embed]:
+    categories = list(get_categories(include_management, include_admin_tools, in_guild, in_nsfw_context))
     overview = discord.Embed(
         title="Help Menu - Ram's Guide For Beginners",
         description=(

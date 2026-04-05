@@ -1,6 +1,57 @@
 HELP_GIF_URL = "https://c.tenor.com/wklB6YsMfXEAAAAd/ram-re.gif"
 GUILD_JOIN_GIF_URL = "https://media.tenor.com/gSGAezNE6SoAAAAC/re-zero-ram.gif"
 OTAKU_GIFS_API_URL = "https://api.otakugifs.xyz/gif?reaction={reaction}"
+GELBOORU_API_URL = "https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&limit=20"
+GELBOORU_STARTER_TAGS = (
+    "pussy",
+    "anal",
+    "boobs",
+    "ass",
+    "tentacle",
+    "thigh",
+    "paizuri",
+    "hentai",
+    "neko",
+    "maid",
+    "ram_(re:zero)",
+)
+
+GELBOORU_NSFW_PRESETS = {
+    "pussy": "pussy",
+    "tits": "boobs,oppai",
+    "ass": "ass",
+    "maid": "maid,~ram_(re:zero),~rem_(re:zero)",
+    "anal": "anal",
+    "thighs": "thigh,legs",
+    "blowjob": "fellatio",
+    "paizuri": "paizuri",
+    "handjob": "handjob",
+    "footjob": "footjob",
+    "creampie": "creampie,cum_in_pussy",
+    "ahegao": "ahegao",
+    "stockings": "thighhighs,stockings",
+    "bikini": "bikini,micro_bikini",
+    "naked_apron": "naked_apron",
+    "bondage": "bondage",
+    "tentacles": "tentacles",
+    "doggystyle": "doggystyle",
+    "facial": "facial",
+    "thighjob": "intercrural_sex",
+    "armpit": "armpit_sex",
+    "lingerie": "lingerie",
+    "cum": "cum,ejaculation",
+    "yuri": "yuri",
+    "uniform": "school_uniform",
+    "public": "public",
+    "nude": "nude",
+    "spread": "spread_legs,pussy",
+    "missionary": "missionary",
+    "cowgirl": "cowgirl_position",
+    "69": "69",
+    "nipples": "nipples",
+    "panties": "panties",
+    "garter": "garter_belt",
+}
 
 ROLEPLAY_REACTIONS = {
     "airkiss": "airkiss",
@@ -14,6 +65,7 @@ ROLEPLAY_REACTIONS = {
     "happy": "happy",
     "handhold": "handhold",
     "lick": "lick",
+    "love": "love",
     "nuzzle": "nuzzle",
     "poke": "poke",
     "pout": "pout",
@@ -98,6 +150,11 @@ ROLEPLAY_GIFS = {
         "https://media.tenor.com/6VxRk0n9l6YAAAAC/anime-lick.gif",
         "https://media.tenor.com/0hNUNpL4zjAAAAAC/anime-licking.gif",
         "https://media.tenor.com/65ywxyM8cvgAAAAC/anime-cute-lick.gif",
+    ),
+    "love": (
+        "https://media.tenor.com/4F4xM1TrxL8AAAAC/anime-love.gif",
+        "https://media.tenor.com/Gq0T8n9B4J4AAAAC/anime-love.gif",
+        "https://media.tenor.com/8Q5P8mM3xV0AAAAC/anime-cuddle.gif",
     ),
     "laugh": (
         "https://media.tenor.com/QJjJ7Oy5stoAAAAC/anime-laugh.gif",
@@ -283,6 +340,10 @@ AFFINITY_REPLIES = {
     "close": (
         "Ram is starting to expect you around. Try not to ruin that.",
         "You're familiar now. Don't make Ram regret it.",
+    ),
+    "very_close": (
+        "You've become important to Ram. Don't make her say it twice.",
+        "Ram has grown attached. How troublesome for both of you.",
     ),
 }
 

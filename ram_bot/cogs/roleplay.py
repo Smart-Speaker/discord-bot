@@ -2,7 +2,10 @@ import discord
 from datetime import datetime, timezone
 from discord.ext import commands
 
+from ram_bot.constants import GELBOORU_NSFW_PRESETS, GELBOORU_STARTER_TAGS
+from ram_bot.dialogue import build_nsfw_command_reply, record_interaction
 from ram_bot.embeds import build_action_embed
+from ram_bot.gelbooru import get_gelbooru_post
 from ram_bot.reactions import get_reaction_gif
 
 
@@ -12,6 +15,244 @@ class RoleplayCog(commands.Cog):
 
     def get_profile(self, guild_id: int, user_id: int) -> dict:
         return self.bot.user_profiles.get_profile(f"guild:{guild_id}", user_id)
+
+    def get_context_profile(self, ctx) -> tuple[str, dict]:
+        scope = f"guild:{ctx.guild.id}" if ctx.guild is not None else f"dm:{ctx.author.id}"
+        return scope, self.bot.user_profiles.get_profile(scope, ctx.author.id)
+
+    async def ensure_nsfw(self, ctx) -> bool:
+        if ctx.guild is None:
+            return True
+        if not hasattr(ctx.channel, "is_nsfw") or not ctx.channel.is_nsfw():
+            await ctx.send("That command is only available in DMs or an NSFW server channel.")
+            return False
+        return True
+
+    @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def nsfwcategories(self, ctx):
+        if not await self.ensure_nsfw(ctx):
+            return
+        starters = ", ".join(f"`{tag}`" for tag in GELBOORU_STARTER_TAGS)
+        await ctx.send(
+            "Starter Gelbooru tags:\n"
+            f"{starters}\n\n"
+            "Ram will always add your global include tags and append your global exclude tags automatically."
+        )
+
+    async def send_gelbooru_embed(self, ctx, title: str, query: str):
+        try:
+            post, tags = await get_gelbooru_post(
+                self.bot.config.gelbooru_auth,
+                self.bot.config.gelbooru_global_include,
+                self.bot.config.gelbooru_global_exclude,
+                query,
+            )
+        except RuntimeError:
+            await ctx.send("Gelbooru could not return an image for those tags right now. Try another tag set or use `!nsfwcategories`.")
+            return
+
+        scope, profile = self.get_context_profile(ctx)
+        profile["affinity"] += 2
+        self.bot.user_profiles.save_profile(scope, ctx.author.id, profile)
+        reply_text, relationship = build_nsfw_command_reply(self.bot, ctx, title.split(" - ", 1)[-1].lower())
+        record_interaction(self.bot, ctx, title.split(" - ", 1)[-1].lower())
+
+        embed = discord.Embed(
+            title=title,
+            description=(
+                f"{ctx.author.mention} requested a Gelbooru image.\n"
+                f"{reply_text}\n"
+                f"Tags: `{tags[:900]}`"
+            ),
+            color=discord.Color.from_rgb(248, 186, 203),
+            timestamp=ctx.message.created_at,
+        )
+        embed.set_image(url=post["file_url"])
+        embed.set_footer(text=f"Relationship: {relationship}")
+        await ctx.send(embed=embed)
+
+    @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def nsfw(self, ctx, *, category: str):
+        if not await self.ensure_nsfw(ctx):
+            return
+        await self.send_gelbooru_embed(ctx, f"NSFW - {category.lower()}", category)
+
+    async def send_nsfw_preset(self, ctx, preset_name: str):
+        if not await self.ensure_nsfw(ctx):
+            return
+        await self.send_gelbooru_embed(ctx, f"NSFW - {preset_name}", GELBOORU_NSFW_PRESETS[preset_name])
+
+    @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def pussy(self, ctx):
+        await self.send_nsfw_preset(ctx, "pussy")
+
+    @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def tits(self, ctx):
+        await self.send_nsfw_preset(ctx, "tits")
+
+    @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def ass(self, ctx):
+        await self.send_nsfw_preset(ctx, "ass")
+
+    @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def maid(self, ctx):
+        await self.send_nsfw_preset(ctx, "maid")
+
+    @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def anal(self, ctx):
+        await self.send_nsfw_preset(ctx, "anal")
+
+    @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def thighs(self, ctx):
+        await self.send_nsfw_preset(ctx, "thighs")
+
+    @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def blowjob(self, ctx):
+        await self.send_nsfw_preset(ctx, "blowjob")
+
+    @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def paizuri(self, ctx):
+        await self.send_nsfw_preset(ctx, "paizuri")
+
+    @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def handjob(self, ctx):
+        await self.send_nsfw_preset(ctx, "handjob")
+
+    @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def footjob(self, ctx):
+        await self.send_nsfw_preset(ctx, "footjob")
+
+    @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def creampie(self, ctx):
+        await self.send_nsfw_preset(ctx, "creampie")
+
+    @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def ahegao(self, ctx):
+        await self.send_nsfw_preset(ctx, "ahegao")
+
+    @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def stockings(self, ctx):
+        await self.send_nsfw_preset(ctx, "stockings")
+
+    @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def bikini(self, ctx):
+        await self.send_nsfw_preset(ctx, "bikini")
+
+    @commands.command(name="naked_apron")
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def naked_apron_command(self, ctx):
+        await self.send_nsfw_preset(ctx, "naked_apron")
+
+    @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def bondage(self, ctx):
+        await self.send_nsfw_preset(ctx, "bondage")
+
+    @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def tentacles(self, ctx):
+        await self.send_nsfw_preset(ctx, "tentacles")
+
+    @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def doggystyle(self, ctx):
+        await self.send_nsfw_preset(ctx, "doggystyle")
+
+    @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def facial(self, ctx):
+        await self.send_nsfw_preset(ctx, "facial")
+
+    @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def thighjob(self, ctx):
+        await self.send_nsfw_preset(ctx, "thighjob")
+
+    @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def armpit(self, ctx):
+        await self.send_nsfw_preset(ctx, "armpit")
+
+    @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def lingerie(self, ctx):
+        await self.send_nsfw_preset(ctx, "lingerie")
+
+    @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def cum(self, ctx):
+        await self.send_nsfw_preset(ctx, "cum")
+
+    @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def yuri(self, ctx):
+        await self.send_nsfw_preset(ctx, "yuri")
+
+    @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def uniform(self, ctx):
+        await self.send_nsfw_preset(ctx, "uniform")
+
+    @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def public(self, ctx):
+        await self.send_nsfw_preset(ctx, "public")
+
+    @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def nude(self, ctx):
+        await self.send_nsfw_preset(ctx, "nude")
+
+    @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def spread(self, ctx):
+        await self.send_nsfw_preset(ctx, "spread")
+
+    @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def missionary(self, ctx):
+        await self.send_nsfw_preset(ctx, "missionary")
+
+    @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def cowgirl(self, ctx):
+        await self.send_nsfw_preset(ctx, "cowgirl")
+
+    @commands.command(name="69")
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def sixty_nine(self, ctx):
+        await self.send_nsfw_preset(ctx, "69")
+
+    @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def nipples(self, ctx):
+        await self.send_nsfw_preset(ctx, "nipples")
+
+    @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def panties(self, ctx):
+        await self.send_nsfw_preset(ctx, "panties")
+
+    @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def garter(self, ctx):
+        await self.send_nsfw_preset(ctx, "garter")
 
     async def post_roleplay_bonus(self, ctx, action_name: str):
         if ctx.guild is None:
@@ -28,6 +269,7 @@ class RoleplayCog(commands.Cog):
         profile["last_roleplay_action"] = action_name
         profile["last_roleplay_at"] = now.isoformat()
         self.bot.user_profiles.save_profile(f"guild:{ctx.guild.id}", ctx.author.id, profile)
+        record_interaction(self.bot, ctx, action_name)
         event_statuses = {
             "hug": "Delivering hugs with reluctance",
             "kiss": "Pretending not to notice the flirting",
@@ -306,6 +548,8 @@ class RoleplayCog(commands.Cog):
     @commands.command()
     @commands.cooldown(1, 4, commands.BucketType.user)
     async def lick(self, ctx, member: discord.Member | None = None):
+        if not await self.ensure_nsfw(ctx):
+            return
         await self.send_target_action(
             ctx,
             member,
@@ -314,6 +558,21 @@ class RoleplayCog(commands.Cog):
             "{source_name} licked {target_name}",
             "{target} got licked by {author_name}.",
             "{target} got licked by {source_name}.",
+        )
+
+    @commands.command()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def love(self, ctx, member: discord.Member | None = None):
+        if not await self.ensure_nsfw(ctx):
+            return
+        await self.send_target_action(
+            ctx,
+            member,
+            "love",
+            "{author_name} pulled {target_name} closer",
+            "{source_name} pulled {target_name} closer",
+            "{target} got a heated look from {author_name}.",
+            "{target} got a heated look from {source_name}.",
         )
 
     @commands.command()
@@ -329,9 +588,11 @@ class RoleplayCog(commands.Cog):
             "{target} is crying with {source_name}.",
         )
 
-    @commands.command(hidden=True)
+    @commands.command()
     @commands.cooldown(1, 4, commands.BucketType.user)
     async def bite(self, ctx, member: discord.Member | None = None):
+        if not await self.ensure_nsfw(ctx):
+            return
         await self.send_target_action(
             ctx,
             member,

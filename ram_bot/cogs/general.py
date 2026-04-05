@@ -3,7 +3,8 @@ import random
 from discord.ext import commands
 
 from ram_bot.catalog import find_category, find_command
-from ram_bot.constants import RAM_AI_UNAVAILABLE_REPLIES, RAM_FALLBACK_REPLIES
+from ram_bot.constants import RAM_AI_UNAVAILABLE_REPLIES
+from ram_bot.dialogue import build_dialogue_reply, record_interaction
 from ram_bot.embeds import (
     build_category_help_pages,
     build_command_help_embed,
@@ -61,9 +62,10 @@ class GeneralCog(commands.Cog):
             except RuntimeError:
                 reply = random.choice(RAM_AI_UNAVAILABLE_REPLIES)
         else:
-            reply = random.choice(RAM_FALLBACK_REPLIES)
+            reply = build_dialogue_reply(self.bot, message, "mention")
 
         await message.reply(reply[:2000], mention_author=True)
+        record_interaction(self.bot, message, "mention")
 
     @commands.command(name="help")
     @commands.cooldown(1, 3, commands.BucketType.user)
@@ -76,6 +78,11 @@ class GeneralCog(commands.Cog):
             )
         )
         in_guild = ctx.guild is not None
+        in_nsfw_context = bool(
+            ctx.guild is None or (
+                ctx.guild and hasattr(ctx.channel, "is_nsfw") and ctx.channel.is_nsfw()
+            )
+        )
 
         if not query:
             pages = build_help_pages(
@@ -83,6 +90,7 @@ class GeneralCog(commands.Cog):
                 include_management=include_management,
                 include_admin_tools=include_admin_tools,
                 in_guild=in_guild,
+                in_nsfw_context=in_nsfw_context,
             )
             if len(pages) == 1:
                 await ctx.send(embed=pages[0])
@@ -90,7 +98,7 @@ class GeneralCog(commands.Cog):
                 await ctx.send(embed=pages[0], view=HelpPaginator(ctx.author.id, pages))
             return
 
-        command = find_command(query, include_management, include_admin_tools, in_guild)
+        command = find_command(query, include_management, include_admin_tools, in_guild, in_nsfw_context)
         if command is not None:
             await ctx.send(
                 embed=build_command_help_embed(
@@ -100,7 +108,7 @@ class GeneralCog(commands.Cog):
             )
             return
 
-        category = find_category(query, include_management, include_admin_tools, in_guild)
+        category = find_category(query, include_management, include_admin_tools, in_guild, in_nsfw_context)
         if category is not None:
             pages = build_category_help_pages(
                 prefix=self.bot.command_prefix,
@@ -122,7 +130,9 @@ class GeneralCog(commands.Cog):
     @commands.command()
     @commands.cooldown(1, 3, commands.BucketType.user)
     async def hello(self, ctx):
-        await ctx.reply(f"Hi there! {ctx.author.display_name} :grin:", mention_author=True)
+        reply = build_dialogue_reply(self.bot, ctx, "greeting")
+        await ctx.reply(reply[:2000], mention_author=True)
+        record_interaction(self.bot, ctx, "greeting")
 
     @commands.command()
     @commands.cooldown(1, 8, commands.BucketType.user)

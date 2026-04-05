@@ -7,6 +7,7 @@ class CommandInfo:
     usage: str
     description: str
     guild_only: bool = False
+    nsfw_only: bool = False
 
 
 @dataclass(frozen=True)
@@ -50,8 +51,54 @@ ROLEPLAY_CATEGORY = CategoryInfo(
         CommandInfo("smile", "smile [@user]", "Smile softly, or smile at someone."),
         CommandInfo("shy", "shy [@user]", "Act unexpectedly shy around someone."),
         CommandInfo("glare", "glare [@user]", "Give someone a dramatic anime stare."),
-        CommandInfo("lick", "lick [@user]", "Send a mischievous licking reaction."),
         CommandInfo("cry", "cry [@user]", "Cry on your own, or cry with someone."),
+    ),
+)
+
+NSFW_CATEGORY = CategoryInfo(
+    name="NSFW",
+    label="NSFW",
+    summary="Mature reactions and Gelbooru image pulls for NSFW guild channels.",
+    commands=(
+        CommandInfo("nsfw", "nsfw <tag[,tag2,...]>", "Fetch a Gelbooru image using extra tags plus your global include/exclude rules.", nsfw_only=True),
+        CommandInfo("nsfwcategories", "nsfwcategories", "Show starter tags for Gelbooru NSFW image searches.", nsfw_only=True),
+        CommandInfo("pussy", "pussy", "Fetch an explicit pussy-themed Gelbooru image using your preset filters.", nsfw_only=True),
+        CommandInfo("tits", "tits", "Fetch an explicit breasts-themed Gelbooru image using your preset filters.", nsfw_only=True),
+        CommandInfo("ass", "ass", "Fetch an explicit ass-themed Gelbooru image using your preset filters.", nsfw_only=True),
+        CommandInfo("maid", "maid", "Fetch an explicit maid-themed Gelbooru image using your preset filters.", nsfw_only=True),
+        CommandInfo("anal", "anal", "Fetch an explicit anal-themed Gelbooru image using your preset filters.", nsfw_only=True),
+        CommandInfo("thighs", "thighs", "Fetch an explicit thigh-focused Gelbooru image using your preset filters.", nsfw_only=True),
+        CommandInfo("blowjob", "blowjob", "Fetch an explicit blowjob-themed Gelbooru image using your preset filters.", nsfw_only=True),
+        CommandInfo("paizuri", "paizuri", "Fetch an explicit paizuri-themed Gelbooru image using your preset filters.", nsfw_only=True),
+        CommandInfo("handjob", "handjob", "Fetch an explicit handjob-themed Gelbooru image using your preset filters.", nsfw_only=True),
+        CommandInfo("footjob", "footjob", "Fetch an explicit footjob-themed Gelbooru image using your preset filters.", nsfw_only=True),
+        CommandInfo("creampie", "creampie", "Fetch an explicit creampie-themed Gelbooru image using your preset filters.", nsfw_only=True),
+        CommandInfo("ahegao", "ahegao", "Fetch an explicit ahegao-themed Gelbooru image using your preset filters.", nsfw_only=True),
+        CommandInfo("stockings", "stockings", "Fetch an explicit stockings-themed Gelbooru image using your preset filters.", nsfw_only=True),
+        CommandInfo("bikini", "bikini", "Fetch an explicit bikini-themed Gelbooru image using your preset filters.", nsfw_only=True),
+        CommandInfo("naked_apron", "naked_apron", "Fetch an explicit naked apron-themed Gelbooru image using your preset filters.", nsfw_only=True),
+        CommandInfo("bondage", "bondage", "Fetch an explicit bondage-themed Gelbooru image using your preset filters.", nsfw_only=True),
+        CommandInfo("tentacles", "tentacles", "Fetch an explicit tentacles-themed Gelbooru image using your preset filters.", nsfw_only=True),
+        CommandInfo("doggystyle", "doggystyle", "Fetch an explicit doggystyle-themed Gelbooru image using your preset filters.", nsfw_only=True),
+        CommandInfo("facial", "facial", "Fetch an explicit facial-themed Gelbooru image using your preset filters.", nsfw_only=True),
+        CommandInfo("thighjob", "thighjob", "Fetch an explicit thighjob-themed Gelbooru image using your preset filters.", nsfw_only=True),
+        CommandInfo("armpit", "armpit", "Fetch an explicit armpit-themed Gelbooru image using your preset filters.", nsfw_only=True),
+        CommandInfo("lingerie", "lingerie", "Fetch an explicit lingerie-themed Gelbooru image using your preset filters.", nsfw_only=True),
+        CommandInfo("cum", "cum", "Fetch an explicit cum-themed Gelbooru image using your preset filters.", nsfw_only=True),
+        CommandInfo("yuri", "yuri", "Fetch an explicit yuri-themed Gelbooru image using your preset filters.", nsfw_only=True),
+        CommandInfo("uniform", "uniform", "Fetch an explicit uniform-themed Gelbooru image using your preset filters.", nsfw_only=True),
+        CommandInfo("public", "public", "Fetch an explicit public-themed Gelbooru image using your preset filters.", nsfw_only=True),
+        CommandInfo("nude", "nude", "Fetch an explicit nude-themed Gelbooru image using your preset filters.", nsfw_only=True),
+        CommandInfo("spread", "spread", "Fetch an explicit spread-themed Gelbooru image using your preset filters.", nsfw_only=True),
+        CommandInfo("missionary", "missionary", "Fetch an explicit missionary-themed Gelbooru image using your preset filters.", nsfw_only=True),
+        CommandInfo("cowgirl", "cowgirl", "Fetch an explicit cowgirl-themed Gelbooru image using your preset filters.", nsfw_only=True),
+        CommandInfo("69", "69", "Fetch an explicit sixty-nine-themed Gelbooru image using your preset filters.", nsfw_only=True),
+        CommandInfo("nipples", "nipples", "Fetch an explicit nipples-themed Gelbooru image using your preset filters.", nsfw_only=True),
+        CommandInfo("panties", "panties", "Fetch an explicit panties-themed Gelbooru image using your preset filters.", nsfw_only=True),
+        CommandInfo("garter", "garter", "Fetch an explicit garter-themed Gelbooru image using your preset filters.", nsfw_only=True),
+        CommandInfo("lick", "lick [@user]", "Send a mischievous licking reaction.", nsfw_only=True),
+        CommandInfo("bite", "bite [@user]", "Bite someone in a more heated playful way.", nsfw_only=True),
+        CommandInfo("love", "love [@user]", "Show stronger affectionate interest in an NSFW channel.", nsfw_only=True),
     ),
 )
 
@@ -137,24 +184,35 @@ MANAGEMENT_CATEGORY = CategoryInfo(
 )
 
 
-def visible_commands(commands: tuple[CommandInfo, ...], in_guild: bool) -> tuple[CommandInfo, ...]:
-    return tuple(command for command in commands if in_guild or not command.guild_only)
+def visible_commands(commands: tuple[CommandInfo, ...], in_guild: bool, in_nsfw_context: bool) -> tuple[CommandInfo, ...]:
+    return tuple(
+        command
+        for command in commands
+        if (in_guild or not command.guild_only) and (in_nsfw_context or not command.nsfw_only)
+    )
 
 
-def get_categories(include_management: bool, include_admin_tools: bool = False, in_guild: bool = True) -> tuple[CategoryInfo, ...]:
+def get_categories(
+    include_management: bool,
+    include_admin_tools: bool = False,
+    in_guild: bool = True,
+    in_nsfw_context: bool = False,
+) -> tuple[CategoryInfo, ...]:
     categories = [
         GENERAL_CATEGORY,
         ROLEPLAY_CATEGORY,
         PROGRESSION_CATEGORY,
         UTILITY_CATEGORY,
     ]
+    if in_nsfw_context:
+        categories.append(NSFW_CATEGORY)
     if include_admin_tools:
         categories.extend([MODERATION_CATEGORY, SERVER_CATEGORY])
     if include_management:
         categories.append(MANAGEMENT_CATEGORY)
     filtered_categories = []
     for category in categories:
-        commands = visible_commands(category.commands, in_guild)
+        commands = visible_commands(category.commands, in_guild, in_nsfw_context)
         if commands:
             filtered_categories.append(
                 CategoryInfo(
@@ -166,18 +224,30 @@ def get_categories(include_management: bool, include_admin_tools: bool = False, 
             )
     return tuple(filtered_categories)
 
-def find_command(query: str, include_management: bool, include_admin_tools: bool = False, in_guild: bool = True) -> CommandInfo | None:
+def find_command(
+    query: str,
+    include_management: bool,
+    include_admin_tools: bool = False,
+    in_guild: bool = True,
+    in_nsfw_context: bool = False,
+) -> CommandInfo | None:
     lowered = query.lower()
-    for category in get_categories(include_management, include_admin_tools, in_guild):
+    for category in get_categories(include_management, include_admin_tools, in_guild, in_nsfw_context):
         for command in category.commands:
             if command.name == lowered:
                 return command
     return None
 
 
-def find_category(query: str, include_management: bool, include_admin_tools: bool = False, in_guild: bool = True) -> CategoryInfo | None:
+def find_category(
+    query: str,
+    include_management: bool,
+    include_admin_tools: bool = False,
+    in_guild: bool = True,
+    in_nsfw_context: bool = False,
+) -> CategoryInfo | None:
     lowered = query.lower()
-    for category in get_categories(include_management, include_admin_tools, in_guild):
+    for category in get_categories(include_management, include_admin_tools, in_guild, in_nsfw_context):
         if category.name.lower() == lowered:
             return category
     return None
